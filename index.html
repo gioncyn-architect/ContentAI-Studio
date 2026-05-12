@@ -10,14 +10,14 @@
 </head>
 <body>
 
-<!-- SIDEBAR NAV -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon">🎬</div>
-    <span class="logo-text">ContentAI</span>
+<!-- TOP NAVBAR -->
+<header class="topnav" id="topnav">
+  <div class="topnav-brand">
+    <span class="brand-icon">🎬</span>
+    <span class="brand-name">ContentAI</span>
   </div>
 
-  <nav class="sidebar-nav">
+  <nav class="topnav-links">
     <button class="nav-btn active" data-page="dashboard" onclick="navigateTo('dashboard')">
       <span class="nav-icon">⚡</span>
       <span class="nav-label">Dashboard</span>
@@ -26,28 +26,31 @@
       <span class="nav-icon">🔑</span>
       <span class="nav-label">API Keys</span>
     </button>
-    <div class="nav-section-label">AGENT KARYAWAN</div>
-    <button class="nav-btn agent-btn" data-page="agent1" onclick="navigateTo('agent1')">
-      <span class="nav-icon">🔍</span>
-      <span class="nav-label">Budi — Trend Finder</span>
-      <span class="agent-status-dot" id="dot-agent1"></span>
-    </button>
-    <button class="nav-btn agent-btn" data-page="agent2" onclick="navigateTo('agent2')">
-      <span class="nav-icon">✍️</span>
-      <span class="nav-label">Sari — Summarizer</span>
-      <span class="agent-status-dot" id="dot-agent2"></span>
-    </button>
-    <button class="nav-btn agent-btn" data-page="agent3" onclick="navigateTo('agent3')">
-      <span class="nav-icon">💡</span>
-      <span class="nav-label">Raka — Prompt Maker</span>
-      <span class="agent-status-dot" id="dot-agent3"></span>
-    </button>
-    <button class="nav-btn agent-btn" data-page="agent4" onclick="navigateTo('agent4')">
-      <span class="nav-icon">🎥</span>
-      <span class="nav-label">Nisa — Video Creator</span>
-      <span class="agent-status-dot" id="dot-agent4"></span>
-    </button>
-    <div class="nav-section-label">HASIL</div>
+    <div class="nav-dropdown-wrap">
+      <button class="nav-btn nav-dropdown-trigger" id="agents-trigger" onclick="toggleAgentsDropdown()">
+        <span class="nav-icon">🤖</span>
+        <span class="nav-label">Agents</span>
+        <span class="dropdown-arrow" id="dropdown-arrow">▾</span>
+      </button>
+      <div class="nav-dropdown" id="agents-dropdown">
+        <button class="dropdown-item" data-page="agent1" onclick="navigateTo('agent1')">
+          <span>🔍</span> Budi — Trend Finder
+          <span class="agent-status-dot" id="dot-agent1"></span>
+        </button>
+        <button class="dropdown-item" data-page="agent2" onclick="navigateTo('agent2')">
+          <span>✍️</span> Sari — Summarizer
+          <span class="agent-status-dot" id="dot-agent2"></span>
+        </button>
+        <button class="dropdown-item" data-page="agent3" onclick="navigateTo('agent3')">
+          <span>💡</span> Raka — Prompt Maker
+          <span class="agent-status-dot" id="dot-agent3"></span>
+        </button>
+        <button class="dropdown-item" data-page="agent4" onclick="navigateTo('agent4')">
+          <span>🎥</span> Nisa — Video Creator
+          <span class="agent-status-dot" id="dot-agent4"></span>
+        </button>
+      </div>
+    </div>
     <button class="nav-btn" data-page="results" onclick="navigateTo('results')">
       <span class="nav-icon">📦</span>
       <span class="nav-label">Video Output</span>
@@ -55,30 +58,49 @@
     </button>
   </nav>
 
-  <div class="sidebar-schedule">
-    <div class="schedule-title">⏰ Jadwal Hari Ini</div>
-    <div class="schedule-item" id="sched-07"><span>07:00</span><span class="sched-status" id="ss-07">–</span></div>
-    <div class="schedule-item" id="sched-12"><span>12:00</span><span class="sched-status" id="ss-12">–</span></div>
-    <div class="schedule-item" id="sched-20"><span>20:00</span><span class="sched-status" id="ss-20">–</span></div>
+  <div class="topnav-right">
+    <div class="clock-display" id="clock-display">--:--:--</div>
+    <div class="system-status">
+      <span class="pulse-dot"></span>
+      <span class="status-text">Aktif</span>
+    </div>
+    <!-- Mobile hamburger -->
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
+      <span></span><span></span><span></span>
+    </button>
   </div>
-</aside>
+</header>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobile-menu">
+  <button class="mob-btn" data-page="dashboard" onclick="navigateTo('dashboard');toggleMobileMenu()">⚡ Dashboard</button>
+  <button class="mob-btn" data-page="keys" onclick="navigateTo('keys');toggleMobileMenu()">🔑 API Keys</button>
+  <div class="mob-section">🤖 Agent Karyawan</div>
+  <button class="mob-btn" data-page="agent1" onclick="navigateTo('agent1');toggleMobileMenu()">🔍 Budi — Trend Finder</button>
+  <button class="mob-btn" data-page="agent2" onclick="navigateTo('agent2');toggleMobileMenu()">✍️ Sari — Summarizer</button>
+  <button class="mob-btn" data-page="agent3" onclick="navigateTo('agent3');toggleMobileMenu()">💡 Raka — Prompt Maker</button>
+  <button class="mob-btn" data-page="agent4" onclick="navigateTo('agent4');toggleMobileMenu()">🎥 Nisa — Video Creator</button>
+  <button class="mob-btn" data-page="results" onclick="navigateTo('results');toggleMobileMenu()">📦 Video Output</button>
+</div>
+<div class="mobile-overlay" id="mobile-overlay" onclick="toggleMobileMenu()"></div>
+
+<!-- SCHEDULE BAR -->
+<div class="schedule-bar">
+  <span class="schedule-label">⏰ Jadwal:</span>
+  <div class="schedule-item"><span>07:00</span><span class="sched-status" id="ss-07">–</span></div>
+  <div class="schedule-sep">·</div>
+  <div class="schedule-item"><span>12:00</span><span class="sched-status" id="ss-12">–</span></div>
+  <div class="schedule-sep">·</div>
+  <div class="schedule-item"><span>20:00</span><span class="sched-status" id="ss-20">–</span></div>
+</div>
+
+<!-- PAGE TITLE BAR -->
+<div class="page-titlebar">
+  <span id="page-title">Dashboard</span>
+</div>
 
 <!-- MAIN CONTENT -->
 <main class="main-content">
-
-  <!-- TOP BAR -->
-  <header class="topbar">
-    <div class="topbar-left">
-      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-      <span class="page-title" id="page-title">Dashboard</span>
-    </div>
-    <div class="topbar-right">
-      <div class="clock-display" id="clock-display">--:--:--</div>
-      <div class="system-status" id="system-status-badge">
-        <span class="pulse-dot"></span> Sistem Aktif
-      </div>
-    </div>
-  </header>
 
   <!-- PAGE: DASHBOARD -->
   <section class="page active" id="page-dashboard">
@@ -174,10 +196,7 @@
       <div class="key-card">
         <div class="key-card-header">
           <span class="key-logo groq-logo">G</span>
-          <div>
-            <div class="key-name">Groq API Key</div>
-            <div class="key-desc">Untuk Agent Budi — Trend Finder</div>
-          </div>
+          <div><div class="key-name">Groq API Key</div><div class="key-desc">Untuk Agent Budi — Trend Finder</div></div>
           <span class="key-badge" id="badge-groq">❌</span>
         </div>
         <div class="key-input-wrap">
@@ -186,14 +205,10 @@
         </div>
         <a href="https://console.groq.com" target="_blank" class="key-link">Dapatkan key gratis →</a>
       </div>
-
       <div class="key-card">
         <div class="key-card-header">
           <span class="key-logo gemini-logo">Ge</span>
-          <div>
-            <div class="key-name">Gemini API Key</div>
-            <div class="key-desc">Untuk Agent Sari — Summarizer</div>
-          </div>
+          <div><div class="key-name">Gemini API Key</div><div class="key-desc">Untuk Agent Sari — Summarizer</div></div>
           <span class="key-badge" id="badge-gemini">❌</span>
         </div>
         <div class="key-input-wrap">
@@ -202,14 +217,10 @@
         </div>
         <a href="https://aistudio.google.com" target="_blank" class="key-link">Dapatkan key gratis →</a>
       </div>
-
       <div class="key-card">
         <div class="key-card-header">
           <span class="key-logo mistral-logo">M</span>
-          <div>
-            <div class="key-name">Mistral API Key</div>
-            <div class="key-desc">Untuk Agent Raka — Prompt Maker</div>
-          </div>
+          <div><div class="key-name">Mistral API Key</div><div class="key-desc">Untuk Agent Raka — Prompt Maker</div></div>
           <span class="key-badge" id="badge-mistral">❌</span>
         </div>
         <div class="key-input-wrap">
@@ -218,14 +229,10 @@
         </div>
         <a href="https://console.mistral.ai" target="_blank" class="key-link">Dapatkan key gratis →</a>
       </div>
-
       <div class="key-card">
         <div class="key-card-header">
           <span class="key-logo eleven-logo">E</span>
-          <div>
-            <div class="key-name">ElevenLabs API Key</div>
-            <div class="key-desc">Untuk suara narasi video</div>
-          </div>
+          <div><div class="key-name">ElevenLabs API Key</div><div class="key-desc">Untuk suara narasi video</div></div>
           <span class="key-badge" id="badge-eleven">❌</span>
         </div>
         <div class="key-input-wrap">
@@ -234,14 +241,10 @@
         </div>
         <a href="https://elevenlabs.io" target="_blank" class="key-link">Dapatkan key gratis →</a>
       </div>
-
       <div class="key-card">
         <div class="key-card-header">
           <span class="key-logo pexels-logo">Px</span>
-          <div>
-            <div class="key-name">Pexels API Key</div>
-            <div class="key-desc">Untuk stok gambar & video</div>
-          </div>
+          <div><div class="key-name">Pexels API Key</div><div class="key-desc">Untuk stok gambar & video</div></div>
           <span class="key-badge" id="badge-pexels">❌</span>
         </div>
         <div class="key-input-wrap">
@@ -250,14 +253,10 @@
         </div>
         <a href="https://www.pexels.com/api" target="_blank" class="key-link">Dapatkan key gratis →</a>
       </div>
-
       <div class="key-card">
         <div class="key-card-header">
           <span class="key-logo canva-logo">Ca</span>
-          <div>
-            <div class="key-name">Canva API Key</div>
-            <div class="key-desc">Untuk template video visual</div>
-          </div>
+          <div><div class="key-name">Canva API Key</div><div class="key-desc">Untuk template video visual</div></div>
           <span class="key-badge" id="badge-canva">❌</span>
         </div>
         <div class="key-input-wrap">
@@ -267,7 +266,6 @@
         <a href="https://www.canva.com/developers" target="_blank" class="key-link">Dapatkan key gratis →</a>
       </div>
     </div>
-
     <div class="keys-action">
       <button class="btn-save-keys" onclick="saveAllKeys()">💾 Simpan Semua Key & Aktifkan System</button>
     </div>
@@ -292,11 +290,11 @@
         <div class="chat-title">💬 Chat dengan Budi</div>
         <div class="chat-messages" id="chat-agent1">
           <div class="chat-msg agent-msg">
-            <div class="chat-bubble">Halo Boss! Saya Budi, siap mencari trend viral untuk konten Facebook kamu. Setiap jam 7 pagi, 12 siang, dan 8 malam saya akan otomatis bekerja dan langsung kirim hasilnya ke Sari. 🔍</div>
+            <div class="chat-bubble">Halo Boss! Saya Budi, siap mencari trend viral untuk konten Facebook kamu. Setiap jam 7 pagi, 12 siang, dan 8 malam saya akan otomatis bekerja! 🔍</div>
           </div>
         </div>
         <div class="chat-input-area">
-          <input type="text" class="chat-input" id="input-agent1" placeholder="Tanya Budi... (contoh: trend apa yang kamu temukan tadi pagi?)" onkeydown="if(event.key==='Enter') sendChat('agent1')">
+          <input type="text" class="chat-input" id="input-agent1" placeholder="Tanya Budi..." onkeydown="if(event.key==='Enter') sendChat('agent1')">
           <button class="chat-send" onclick="sendChat('agent1')">Kirim ➤</button>
         </div>
       </div>
@@ -325,7 +323,7 @@
         <div class="chat-title">💬 Chat dengan Sari</div>
         <div class="chat-messages" id="chat-agent2">
           <div class="chat-msg agent-msg">
-            <div class="chat-bubble">Hai Boss! Saya Sari. Tugas saya meringkas semua trend yang dikirim Budi menjadi konten yang menarik dan mudah dipahami. Saya langsung kirim ke Raka setelah selesai! ✍️</div>
+            <div class="chat-bubble">Hai Boss! Saya Sari. Tugas saya meringkas semua trend dari Budi menjadi konten yang menarik dan siap dipakai. ✍️</div>
           </div>
         </div>
         <div class="chat-input-area">
@@ -358,7 +356,7 @@
         <div class="chat-title">💬 Chat dengan Raka</div>
         <div class="chat-messages" id="chat-agent3">
           <div class="chat-msg agent-msg">
-            <div class="chat-bubble">Yo Boss! Saya Raka. Saya yang bikin ide kreatif dan prompt video dari ringkasan Sari. Setiap prompt yang saya buat sudah dioptimasi untuk konten Facebook yang viral. Langsung saya kirim ke Nisa! 💡</div>
+            <div class="chat-bubble">Yo Boss! Saya Raka. Saya yang bikin ide kreatif dan prompt video dari ringkasan Sari, dioptimasi untuk konten Facebook viral! 💡</div>
           </div>
         </div>
         <div class="chat-input-area">
@@ -391,7 +389,7 @@
         <div class="chat-title">💬 Chat dengan Nisa</div>
         <div class="chat-messages" id="chat-agent4">
           <div class="chat-msg agent-msg">
-            <div class="chat-bubble">Halo Boss! Saya Nisa, karyawan terakhir di pipeline ini. Saya yang mengubah prompt dari Raka menjadi video nyata menggunakan Canva, Pexels, dan ElevenLabs untuk suara narasi. Video siap unduh langsung dari sini! 🎥</div>
+            <div class="chat-bubble">Halo Boss! Saya Nisa. Saya yang mengubah prompt dari Raka menjadi video nyata menggunakan Canva, Pexels, dan ElevenLabs. Siap unduh! 🎥</div>
           </div>
         </div>
         <div class="chat-input-area">
