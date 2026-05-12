@@ -28,6 +28,15 @@ document.addEventListener('DOMContentLoaded', () => {
   startClock();
   startScheduler();
   updateAllUI();
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    const wrap = document.getElementById('agents-dropdown');
+    const trigger = document.getElementById('agents-trigger');
+    if (wrap && !wrap.contains(e.target) && !trigger.contains(e.target)) {
+      closeAgentsDropdown();
+    }
+  });
 });
 
 function loadFromStorage() {
@@ -40,7 +49,6 @@ function loadFromStorage() {
     STATE.videos = parsed.videos || [];
     STATE.lastResults = parsed.lastResults || STATE.lastResults;
   }
-  // Populate key inputs
   Object.entries(STATE.keys).forEach(([k, v]) => {
     const el = document.getElementById(`key-${k}`);
     if (el && v) { el.value = v; updateKeyBadge(k, true); }
@@ -87,7 +95,6 @@ function startScheduler() {
         runFullPipeline(`Jadwal ${h}:00`);
       }
     }
-    // Reset schedule at midnight
     if (h === 0 && m === 0 && s === 5) {
       STATE.scheduleStatus = { '07': 'pending', '12': 'pending', '20': 'pending' };
     }
@@ -127,20 +134,69 @@ function updateScheduleUI() {
 function navigateTo(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.dropdown-item').forEach(b => b.classList.remove('active'));
+
   document.getElementById(`page-${page}`)?.classList.add('active');
-  document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
+
+  // Activate top nav button
+  const topBtn = document.querySelector(`.topnav-links [data-page="${page}"]`);
+  if (topBtn) topBtn.classList.add('active');
+
+  // Activate agents trigger if an agent page
+  const agentPages = ['agent1','agent2','agent3','agent4'];
+  if (agentPages.includes(page)) {
+    document.getElementById('agents-trigger')?.classList.add('active');
+  }
+
+  // Activate dropdown item
+  const dropItem = document.querySelector(`.dropdown-item[data-page="${page}"]`);
+  if (dropItem) dropItem.classList.add('active');
+
+  // Update page title bar
   const titles = {
-    dashboard: 'Dashboard', keys: 'API Keys',
-    agent1: 'Budi — Trend Finder', agent2: 'Sari — Summarizer',
-    agent3: 'Raka — Prompt Maker', agent4: 'Nisa — Video Creator',
-    results: 'Video Output'
+    dashboard: '⚡ Dashboard', keys: '🔑 API Keys',
+    agent1: '🔍 Budi — Trend Finder', agent2: '✍️ Sari — Summarizer',
+    agent3: '💡 Raka — Prompt Maker', agent4: '🎥 Nisa — Video Creator',
+    results: '📦 Video Output'
   };
   document.getElementById('page-title').textContent = titles[page] || page;
+
+  // Close dropdown after nav
+  closeAgentsDropdown();
+
   if (page === 'results') updateResultsPage();
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
+// ── DROPDOWN ─────────────────────────────────────
+function toggleAgentsDropdown() {
+  const dropdown = document.getElementById('agents-dropdown');
+  const arrow = document.getElementById('dropdown-arrow');
+  const isOpen = dropdown.classList.contains('open');
+  if (isOpen) {
+    closeAgentsDropdown();
+  } else {
+    dropdown.classList.add('open');
+    arrow.classList.add('open');
+  }
+}
+
+function closeAgentsDropdown() {
+  document.getElementById('agents-dropdown')?.classList.remove('open');
+  document.getElementById('dropdown-arrow')?.classList.remove('open');
+}
+
+// ── MOBILE MENU ──────────────────────────────────
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const overlay = document.getElementById('mobile-overlay');
+  const hamburger = document.getElementById('hamburger');
+  const isOpen = menu.classList.contains('open');
+  menu.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('open', !isOpen);
+  hamburger.classList.toggle('open', !isOpen);
 }
 
 // ── API KEY MANAGEMENT ──────────────────────────
@@ -198,7 +254,6 @@ async function runFullPipeline(source = 'Manual') {
   if (progressEl) { progressEl.style.display = 'block'; }
   addLog('info', '🚀', `Pipeline dimulai (${source})`);
 
-  // STEP 1: Agent 1 — Trend Finder (Groq)
   setNodeStatus(1, 'working');
   setAgentStatus('a1', '🔄 Sedang mencari trend...');
   setProgress(fillEl, textEl, 10, '🔍 Budi sedang mencari trend viral...');
@@ -221,12 +276,10 @@ async function runFullPipeline(source = 'Manual') {
   document.getElementById('a1-found').textContent = STATE.agentStats.a1.found;
   updateAgentDot('agent1', 'done');
   displayAgentResult('a1', trendResult, 'Trend Report');
-  // Auto-send ke chat agent1
   addAgentChat('agent1', `Laporan ${source}:\n\n${trendResult}`);
 
   await delay(400);
 
-  // STEP 2: Agent 2 — Summarizer (Gemini)
   setNodeStatus(2, 'working');
   setAgentStatus('a2', '🔄 Meringkas konten...');
   setProgress(fillEl, textEl, 45, '✍️ Sari sedang meringkas trend...');
@@ -251,7 +304,6 @@ async function runFullPipeline(source = 'Manual') {
 
   await delay(400);
 
-  // STEP 3: Agent 3 — Prompt Maker (Mistral)
   setNodeStatus(3, 'working');
   setAgentStatus('a3', '🔄 Membuat prompt video...');
   setProgress(fillEl, textEl, 72, '💡 Raka sedang membuat ide video...');
@@ -276,14 +328,12 @@ async function runFullPipeline(source = 'Manual') {
 
   await delay(400);
 
-  // STEP 4: Agent 4 — Video Creator (Simulation + Pexels)
   setNodeStatus(4, 'working');
   setAgentStatus('a4', '🔄 Membuat video...');
   setProgress(fillEl, textEl, 92, '🎥 Nisa sedang membuat video...');
   addLog('info', '🎥', 'Nisa (Agent 4) mulai membuat video...');
   await delay(800);
 
-  // Generate video data (simulation with Pexels)
   const videoData = await createVideoData(promptResult, source);
 
   STATE.lastResults.a4 = videoData;
@@ -300,7 +350,7 @@ async function runFullPipeline(source = 'Manual') {
   document.getElementById('a4-videos').textContent = STATE.agentStats.a4.videos;
   updateAgentDot('agent4', 'done');
   document.getElementById('result-badge').textContent = STATE.videos.length;
-  addAgentChat('agent4', `Boss! Video sudah selesai dibuat! 🎉\n\nSaya berhasil membuat ${videoData.length} video dari prompt Raka. Semua sudah tersedia di halaman Video Output dan siap diunduh. Durasi masing-masing sekitar 60-90 detik dengan narasi dari ElevenLabs.\n\nTinggal download dan upload ke Facebook! 🚀`);
+  addAgentChat('agent4', `Boss! Video sudah selesai dibuat! 🎉\n\nSaya berhasil membuat ${videoData.length} video dari prompt Raka. Semua sudah tersedia di halaman Video Output dan siap diunduh!\n\nTinggal download dan upload ke Facebook! 🚀`);
   displayVideoResults(videoData);
 
   await delay(1000);
@@ -310,7 +360,6 @@ async function runFullPipeline(source = 'Manual') {
   updateResultsPage();
   saveToStorage();
 
-  // Reset pipeline nodes after 10s
   setTimeout(() => {
     [1,2,3,4].forEach(n => setNodeStatus(n, 'idle'));
     ['a1','a2','a3','a4'].forEach(a => setAgentStatus(a, '⏸ Standby'));
@@ -327,11 +376,7 @@ async function callGroq(apiKey, prompt) {
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'llama3-8b-8192',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 800
-      })
+      body: JSON.stringify({ model: 'llama3-8b-8192', messages: [{ role: 'user', content: prompt }], max_tokens: 800 })
     });
     if (!res.ok) return generateFallbackTrends();
     const data = await res.json();
@@ -359,11 +404,7 @@ async function callMistral(apiKey, prompt) {
     const res = await fetch('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'mistral-small-latest',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 900
-      })
+      body: JSON.stringify({ model: 'mistral-small-latest', messages: [{ role: 'user', content: prompt }], max_tokens: 900 })
     });
     if (!res.ok) return generateFallbackPrompt();
     const data = await res.json();
@@ -371,7 +412,6 @@ async function callMistral(apiKey, prompt) {
   } catch { return generateFallbackPrompt(); }
 }
 
-// Chat ke agent (menggunakan AI masing-masing)
 async function sendChat(agentId) {
   const inputEl = document.getElementById(`input-${agentId}`);
   const msg = inputEl?.value?.trim();
@@ -494,8 +534,6 @@ async function createVideoData(promptText, source) {
   const now = new Date();
   const timeLabel = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
   const dateLabel = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-
-  // Extract video titles from prompt text
   const titles = extractVideoTitles(promptText);
   const emojis = ['🔥', '💥', '⚡', '🚀', '🌟'];
   const topics = ['Viral Indonesia', 'Trending Hari Ini', 'Konten Populer', 'Info Terkini', 'Fakta Menarik'];
@@ -503,9 +541,7 @@ async function createVideoData(promptText, source) {
   return titles.map((title, i) => ({
     id: `vid_${Date.now()}_${i}`,
     title: title || `${emojis[i % 5]} Video ${topics[i % 5]} — ${timeLabel}`,
-    source,
-    dateLabel,
-    timeLabel,
+    source, dateLabel, timeLabel,
     emoji: emojis[i % 5],
     prompt: promptText.slice(0, 200) + '...',
     pexelsQuery: getPexelsQuery(promptText, i),
@@ -585,14 +621,11 @@ function updateResultsPage() {
 function downloadVideo(id) {
   const v = STATE.videos.find(x => x.id === id);
   if (!v) return;
-  // Generate a downloadable text file with video brief (actual video would need Canva/Pexels API integration)
   const content = `FACEBOOK CONTENT VIDEO BRIEF\n${'='.repeat(40)}\n\nJUDUL: ${v.title}\nTANGGAL: ${v.dateLabel}\nDURASI: ${v.duration}\nSUMBER: ${v.source}\n\nPROMPT:\n${v.prompt}\n\nCatatan: File ini berisi brief video. Upload ke Canva untuk membuat video final.\nPexels Query: ${v.pexelsQuery}`;
   const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = `video_brief_${v.id}.txt`;
-  a.click();
+  a.href = url; a.download = `video_brief_${v.id}.txt`; a.click();
   URL.revokeObjectURL(url);
   showToast('📥 Video brief berhasil diunduh!');
 }
@@ -632,9 +665,9 @@ function setAgentStatus(agentKey, text) {
 }
 
 function updateAgentDot(agentId, status) {
-  const dot = document.getElementById(`dot-${agentId}`);
-  if (!dot) return;
-  dot.className = `agent-status-dot ${status}`;
+  // Update dots in both topnav dropdown and mobile menu
+  const dots = document.querySelectorAll(`#dot-${agentId}`);
+  dots.forEach(dot => { dot.className = `agent-status-dot ${status}`; });
 }
 
 function setProgress(fillEl, textEl, pct, text) {
@@ -643,8 +676,6 @@ function setProgress(fillEl, textEl, pct, text) {
 }
 
 // ── ACTIVITY LOG ─────────────────────────────────
-const LOG_TYPES = { success: '✅', info: 'ℹ️', warn: '⚠️', error: '❌' };
-
 function addLog(type, icon, text) {
   const log = document.getElementById('activity-log');
   if (!log) return;
@@ -655,7 +686,6 @@ function addLog(type, icon, text) {
   entry.innerHTML = `<span class="log-icon">${icon}</span><span class="log-text">${escHtml(text)}</span><span class="log-time">${timeStr()}</span>`;
   log.appendChild(entry);
   log.scrollTop = log.scrollHeight;
-  // Keep max 50 entries
   while (log.children.length > 50) log.removeChild(log.firstChild);
 }
 
@@ -681,10 +711,10 @@ function generateFallbackPrompt() {
 
 function getFallbackReply(agentId, msg) {
   const replies = {
-    agent1: `Halo Boss! Pertanyaan yang bagus. Saya Budi, sedang standby sekarang. Untuk mengaktifkan saya secara penuh, masukkan Groq API key di halaman API Keys. Untuk sementara, saya sudah menyiapkan data demo trend untuk kamu review! 🔍`,
-    agent2: `Hai Boss! Sari di sini. Saya sudah menerima data dari Budi dan merangkumnya. Untuk respons yang lebih personal dan real-time, masukkan Gemini API key ya! Tapi data demo sudah saya siapkan. ✍️`,
-    agent3: `Yo Boss! Raka siap! Saya sudah buat beberapa prompt video keren dari ringkasan Sari. Mau langsung ke Nisa? Untuk fitur penuh, masukkan Mistral API key! 💡`,
-    agent4: `Halo Boss! Nisa di sini. Video brief sudah siap dan bisa diunduh dari halaman Video Output! Untuk video yang lebih canggih dengan integrasi Canva dan Pexels penuh, setup API key dulu ya Boss! 🎥`
+    agent1: `Halo Boss! Saya Budi, sedang standby sekarang. Untuk mengaktifkan saya secara penuh, masukkan Groq API key di halaman API Keys. Data demo sudah saya siapkan! 🔍`,
+    agent2: `Hai Boss! Sari di sini. Untuk respons yang lebih personal dan real-time, masukkan Gemini API key ya! Tapi data demo sudah saya siapkan. ✍️`,
+    agent3: `Yo Boss! Raka siap! Untuk fitur penuh, masukkan Mistral API key! 💡`,
+    agent4: `Halo Boss! Nisa di sini. Video brief sudah siap dan bisa diunduh dari halaman Video Output! 🎥`
   };
   return replies[agentId] || 'Maaf, saya tidak bisa menjawab saat ini. Coba lagi!';
 }
@@ -723,7 +753,6 @@ function updateAllUI() {
   document.getElementById('a4-runs').textContent = STATE.agentStats.a4.runs;
   document.getElementById('a4-videos').textContent = STATE.agentStats.a4.videos;
 
-  // Restore last results
   if (STATE.lastResults.a1) displayAgentResult('a1', STATE.lastResults.a1, 'Trend Report');
   if (STATE.lastResults.a2) displayAgentResult('a2', STATE.lastResults.a2, 'Content Summary');
   if (STATE.lastResults.a3) displayAgentResult('a3', STATE.lastResults.a3, 'Video Prompt');
