@@ -1,433 +1,635 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ContentAI Studio — Facebook Agent</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ContentAI Studio — Facebook Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- TOP NAVBAR -->
-<header class="topnav" id="topnav">
-  <div class="topnav-brand">
-    <span class="brand-icon">🎬</span>
-    <span class="brand-name">ContentAI</span>
-  </div>
+  <!-- ═══════════════════════════════════════
+       TOP NAVBAR (desktop)
+  ════════════════════════════════════════ -->
+  <header class="topnav" id="topnav" role="banner">
 
-  <nav class="topnav-links">
-    <button class="nav-btn active" data-page="dashboard" onclick="navigateTo('dashboard')">
-      <span class="nav-icon">⚡</span>
-      <span class="nav-label">Dashboard</span>
-    </button>
-    <button class="nav-btn" data-page="keys" onclick="navigateTo('keys')">
-      <span class="nav-icon">🔑</span>
-      <span class="nav-label">API Keys</span>
-    </button>
-    <div class="nav-dropdown-wrap">
-      <button class="nav-btn nav-dropdown-trigger" id="agents-trigger" onclick="toggleAgentsDropdown()">
-        <span class="nav-icon">🤖</span>
-        <span class="nav-label">Agents</span>
-        <span class="dropdown-arrow" id="dropdown-arrow">▾</span>
-      </button>
-      <div class="nav-dropdown" id="agents-dropdown">
-        <button class="dropdown-item" data-page="agent1" onclick="navigateTo('agent1')">
-          <span>🔍</span> Budi — Trend Finder
-          <span class="agent-status-dot" id="dot-agent1"></span>
-        </button>
-        <button class="dropdown-item" data-page="agent2" onclick="navigateTo('agent2')">
-          <span>✍️</span> Sari — Summarizer
-          <span class="agent-status-dot" id="dot-agent2"></span>
-        </button>
-        <button class="dropdown-item" data-page="agent3" onclick="navigateTo('agent3')">
-          <span>💡</span> Raka — Prompt Maker
-          <span class="agent-status-dot" id="dot-agent3"></span>
-        </button>
-        <button class="dropdown-item" data-page="agent4" onclick="navigateTo('agent4')">
-          <span>🎥</span> Nisa — Video Creator
-          <span class="agent-status-dot" id="dot-agent4"></span>
-        </button>
-      </div>
+    <!-- Brand -->
+    <div class="topnav-brand">
+      <span class="brand-icon" aria-hidden="true">🎬</span>
+      <span class="brand-name">ContentAI</span>
     </div>
-    <button class="nav-btn" data-page="results" onclick="navigateTo('results')">
-      <span class="nav-icon">📦</span>
-      <span class="nav-label">Video Output</span>
-      <span class="result-badge" id="result-badge">0</span>
+
+    <!-- Desktop nav links — hidden on mobile via CSS -->
+    <nav class="topnav-links" aria-label="Navigasi utama">
+
+      <button class="nav-btn active" data-page="dashboard" onclick="navigateTo('dashboard')" aria-current="page">
+        <span class="nav-icon" aria-hidden="true">⚡</span>
+        <span class="nav-label">Dashboard</span>
+      </button>
+
+      <button class="nav-btn" data-page="keys" onclick="navigateTo('keys')">
+        <span class="nav-icon" aria-hidden="true">🔑</span>
+        <span class="nav-label">API Keys</span>
+      </button>
+
+      <!-- Agents dropdown wrapper — stays inside nav, never overlaps mobile menu -->
+      <div class="nav-dropdown-wrap" id="agents-wrap">
+        <button
+          class="nav-btn nav-dropdown-trigger"
+          id="agents-trigger"
+          onclick="toggleAgentsDropdown()"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-controls="agents-dropdown"
+        >
+          <span class="nav-icon" aria-hidden="true">🤖</span>
+          <span class="nav-label">Agents</span>
+          <span class="dropdown-arrow" id="dropdown-arrow" aria-hidden="true">▾</span>
+        </button>
+
+        <div
+          class="nav-dropdown"
+          id="agents-dropdown"
+          role="menu"
+          aria-labelledby="agents-trigger"
+        >
+          <button class="dropdown-item" data-page="agent1" role="menuitem" onclick="navigateTo('agent1')">
+            <span aria-hidden="true">🔍</span>
+            Budi — Trend Finder
+            <span class="agent-status-dot" id="dot-agent1" aria-hidden="true"></span>
+          </button>
+          <button class="dropdown-item" data-page="agent2" role="menuitem" onclick="navigateTo('agent2')">
+            <span aria-hidden="true">✍️</span>
+            Sari — Summarizer
+            <span class="agent-status-dot" id="dot-agent2" aria-hidden="true"></span>
+          </button>
+          <button class="dropdown-item" data-page="agent3" role="menuitem" onclick="navigateTo('agent3')">
+            <span aria-hidden="true">💡</span>
+            Raka — Prompt Maker
+            <span class="agent-status-dot" id="dot-agent3" aria-hidden="true"></span>
+          </button>
+          <button class="dropdown-item" data-page="agent4" role="menuitem" onclick="navigateTo('agent4')">
+            <span aria-hidden="true">🎥</span>
+            Nisa — Video Creator
+            <span class="agent-status-dot" id="dot-agent4" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div><!-- /.nav-dropdown-wrap -->
+
+      <button class="nav-btn" data-page="results" onclick="navigateTo('results')">
+        <span class="nav-icon" aria-hidden="true">📦</span>
+        <span class="nav-label">Video Output</span>
+        <span class="result-badge" id="result-badge" aria-label="jumlah video">0</span>
+      </button>
+
+    </nav><!-- /.topnav-links -->
+
+    <!-- Right section: clock, status, hamburger -->
+    <div class="topnav-right">
+      <div class="clock-display" id="clock-display" aria-live="polite" aria-label="Jam saat ini">--:--:--</div>
+      <div class="system-status" role="status">
+        <span class="pulse-dot" aria-hidden="true"></span>
+        <span class="status-text">Aktif</span>
+      </div>
+      <!-- Hamburger — visible only on mobile -->
+      <button
+        class="hamburger"
+        id="hamburger"
+        onclick="toggleMobileMenu()"
+        aria-label="Buka menu navigasi"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
+
+  </header><!-- /.topnav -->
+
+
+  <!-- ═══════════════════════════════════════
+       MOBILE MENU (slide-down panel)
+       Completely separate from desktop nav.
+       The agents dropdown DOES NOT appear here.
+  ════════════════════════════════════════ -->
+  <nav
+    class="mobile-menu"
+    id="mobile-menu"
+    aria-label="Menu mobile"
+    aria-hidden="true"
+  >
+    <button class="mob-btn" data-page="dashboard"
+      onclick="navigateTo('dashboard'); toggleMobileMenu()">
+      <span aria-hidden="true">⚡</span> Dashboard
+    </button>
+    <button class="mob-btn" data-page="keys"
+      onclick="navigateTo('keys'); toggleMobileMenu()">
+      <span aria-hidden="true">🔑</span> API Keys
+    </button>
+
+    <!-- Section label, not a button -->
+    <div class="mob-section" role="separator" aria-hidden="true">🤖 Agent Karyawan</div>
+
+    <button class="mob-btn" data-page="agent1"
+      onclick="navigateTo('agent1'); toggleMobileMenu()">
+      <span aria-hidden="true">🔍</span> Budi — Trend Finder
+    </button>
+    <button class="mob-btn" data-page="agent2"
+      onclick="navigateTo('agent2'); toggleMobileMenu()">
+      <span aria-hidden="true">✍️</span> Sari — Summarizer
+    </button>
+    <button class="mob-btn" data-page="agent3"
+      onclick="navigateTo('agent3'); toggleMobileMenu()">
+      <span aria-hidden="true">💡</span> Raka — Prompt Maker
+    </button>
+    <button class="mob-btn" data-page="agent4"
+      onclick="navigateTo('agent4'); toggleMobileMenu()">
+      <span aria-hidden="true">🎥</span> Nisa — Video Creator
+    </button>
+    <button class="mob-btn" data-page="results"
+      onclick="navigateTo('results'); toggleMobileMenu()">
+      <span aria-hidden="true">📦</span> Video Output
     </button>
   </nav>
 
-  <div class="topnav-right">
-    <div class="clock-display" id="clock-display">--:--:--</div>
-    <div class="system-status">
-      <span class="pulse-dot"></span>
-      <span class="status-text">Aktif</span>
+  <!-- Dark overlay behind mobile menu -->
+  <div
+    class="mobile-overlay"
+    id="mobile-overlay"
+    onclick="toggleMobileMenu()"
+    aria-hidden="true"
+  ></div>
+
+
+  <!-- ═══════════════════════════════════════
+       SCHEDULE BAR
+  ════════════════════════════════════════ -->
+  <div class="schedule-bar" role="complementary" aria-label="Jadwal otomatis">
+    <span class="schedule-label" aria-hidden="true">⏰ Jadwal:</span>
+    <div class="schedule-item">
+      <span>07:00</span>
+      <span class="sched-status" id="ss-07" aria-label="Status 07:00">–</span>
     </div>
-    <!-- Mobile hamburger -->
-    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()">
-      <span></span><span></span><span></span>
-    </button>
+    <div class="schedule-sep" aria-hidden="true">·</div>
+    <div class="schedule-item">
+      <span>12:00</span>
+      <span class="sched-status" id="ss-12" aria-label="Status 12:00">–</span>
+    </div>
+    <div class="schedule-sep" aria-hidden="true">·</div>
+    <div class="schedule-item">
+      <span>20:00</span>
+      <span class="sched-status" id="ss-20" aria-label="Status 20:00">–</span>
+    </div>
   </div>
-</header>
 
-<!-- MOBILE MENU -->
-<div class="mobile-menu" id="mobile-menu">
-  <button class="mob-btn" data-page="dashboard" onclick="navigateTo('dashboard');toggleMobileMenu()">⚡ Dashboard</button>
-  <button class="mob-btn" data-page="keys" onclick="navigateTo('keys');toggleMobileMenu()">🔑 API Keys</button>
-  <div class="mob-section">🤖 Agent Karyawan</div>
-  <button class="mob-btn" data-page="agent1" onclick="navigateTo('agent1');toggleMobileMenu()">🔍 Budi — Trend Finder</button>
-  <button class="mob-btn" data-page="agent2" onclick="navigateTo('agent2');toggleMobileMenu()">✍️ Sari — Summarizer</button>
-  <button class="mob-btn" data-page="agent3" onclick="navigateTo('agent3');toggleMobileMenu()">💡 Raka — Prompt Maker</button>
-  <button class="mob-btn" data-page="agent4" onclick="navigateTo('agent4');toggleMobileMenu()">🎥 Nisa — Video Creator</button>
-  <button class="mob-btn" data-page="results" onclick="navigateTo('results');toggleMobileMenu()">📦 Video Output</button>
-</div>
-<div class="mobile-overlay" id="mobile-overlay" onclick="toggleMobileMenu()"></div>
 
-<!-- SCHEDULE BAR -->
-<div class="schedule-bar">
-  <span class="schedule-label">⏰ Jadwal:</span>
-  <div class="schedule-item"><span>07:00</span><span class="sched-status" id="ss-07">–</span></div>
-  <div class="schedule-sep">·</div>
-  <div class="schedule-item"><span>12:00</span><span class="sched-status" id="ss-12">–</span></div>
-  <div class="schedule-sep">·</div>
-  <div class="schedule-item"><span>20:00</span><span class="sched-status" id="ss-20">–</span></div>
-</div>
+  <!-- ═══════════════════════════════════════
+       PAGE TITLE BAR
+  ════════════════════════════════════════ -->
+  <div class="page-titlebar" aria-live="polite">
+    <span id="page-title">⚡ Dashboard</span>
+  </div>
 
-<!-- PAGE TITLE BAR -->
-<div class="page-titlebar">
-  <span id="page-title">Dashboard</span>
-</div>
 
-<!-- MAIN CONTENT -->
-<main class="main-content">
+  <!-- ═══════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════════ -->
+  <main class="main-content" id="main-content">
 
-  <!-- PAGE: DASHBOARD -->
-  <section class="page active" id="page-dashboard">
-    <div class="page-header">
-      <h1 class="page-h1">Pusat Kendali Agent</h1>
-      <p class="page-sub">Semua agent bekerja otomatis. Monitor progres mereka di sini.</p>
-    </div>
 
-    <div class="stats-row">
-      <div class="stat-card" style="--c:#FF6B6B">
-        <div class="stat-icon">🎬</div>
-        <div class="stat-val" id="stat-videos">0</div>
-        <div class="stat-label">Video Dibuat</div>
+    <!-- ─── PAGE: DASHBOARD ─── -->
+    <section class="page active" id="page-dashboard" aria-label="Halaman Dashboard">
+      <div class="page-header">
+        <h1 class="page-h1">Pusat Kendali Agent</h1>
+        <p class="page-sub">Semua agent bekerja otomatis. Monitor progres mereka di sini.</p>
       </div>
-      <div class="stat-card" style="--c:#FFD93D">
-        <div class="stat-icon">🔍</div>
-        <div class="stat-val" id="stat-trends">0</div>
-        <div class="stat-label">Trend Ditemukan</div>
-      </div>
-      <div class="stat-card" style="--c:#6BCB77">
-        <div class="stat-icon">⚡</div>
-        <div class="stat-val" id="stat-runs">0</div>
-        <div class="stat-label">Total Run Hari Ini</div>
-      </div>
-      <div class="stat-card" style="--c:#4D96FF">
-        <div class="stat-icon">⏱️</div>
-        <div class="stat-val" id="stat-next">--:--</div>
-        <div class="stat-label">Run Berikutnya</div>
-      </div>
-    </div>
 
-    <div class="pipeline-section">
-      <h2 class="section-title">🔄 Pipeline Agent (Real-time)</h2>
-      <div class="pipeline">
-        <div class="pipeline-node" id="pnode-1">
-          <div class="pnode-avatar">🔍</div>
-          <div class="pnode-name">Budi</div>
-          <div class="pnode-role">Trend Finder</div>
-          <div class="pnode-status idle" id="pstatus-1">Standby</div>
+      <!-- Stats row -->
+      <div class="stats-row" role="list" aria-label="Statistik sistem">
+        <div class="stat-card" style="--c:#FF6B6B" role="listitem">
+          <span class="stat-icon" aria-hidden="true">🎬</span>
+          <div class="stat-val" id="stat-videos">0</div>
+          <div class="stat-label">Video Dibuat</div>
         </div>
-        <div class="pipeline-arrow">→</div>
-        <div class="pipeline-node" id="pnode-2">
-          <div class="pnode-avatar">✍️</div>
-          <div class="pnode-name">Sari</div>
-          <div class="pnode-role">Summarizer</div>
-          <div class="pnode-status idle" id="pstatus-2">Standby</div>
+        <div class="stat-card" style="--c:#FFD93D" role="listitem">
+          <span class="stat-icon" aria-hidden="true">🔍</span>
+          <div class="stat-val" id="stat-trends">0</div>
+          <div class="stat-label">Trend Ditemukan</div>
         </div>
-        <div class="pipeline-arrow">→</div>
-        <div class="pipeline-node" id="pnode-3">
-          <div class="pnode-avatar">💡</div>
-          <div class="pnode-name">Raka</div>
-          <div class="pnode-role">Prompt Maker</div>
-          <div class="pnode-status idle" id="pstatus-3">Standby</div>
+        <div class="stat-card" style="--c:#6BCB77" role="listitem">
+          <span class="stat-icon" aria-hidden="true">⚡</span>
+          <div class="stat-val" id="stat-runs">0</div>
+          <div class="stat-label">Total Run Hari Ini</div>
         </div>
-        <div class="pipeline-arrow">→</div>
-        <div class="pipeline-node" id="pnode-4">
-          <div class="pnode-avatar">🎥</div>
-          <div class="pnode-name">Nisa</div>
-          <div class="pnode-role">Video Creator</div>
-          <div class="pnode-status idle" id="pstatus-4">Standby</div>
+        <div class="stat-card" style="--c:#4D96FF" role="listitem">
+          <span class="stat-icon" aria-hidden="true">⏱️</span>
+          <div class="stat-val" id="stat-next">--:--</div>
+          <div class="stat-label">Run Berikutnya</div>
         </div>
       </div>
-    </div>
 
-    <div class="dashboard-bottom">
-      <div class="activity-log-card">
-        <h2 class="section-title">📋 Log Aktivitas</h2>
-        <div class="activity-log" id="activity-log">
-          <div class="log-empty">Belum ada aktivitas. Masukkan API Key terlebih dahulu.</div>
+      <!-- Pipeline section -->
+      <div class="pipeline-section">
+        <h2 class="section-title">🔄 Pipeline Agent (Real-time)</h2>
+        <div class="pipeline" role="list" aria-label="Status pipeline agent">
+
+          <div class="pipeline-node" id="pnode-1" role="listitem">
+            <span class="pnode-avatar" aria-hidden="true">🔍</span>
+            <div class="pnode-name">Budi</div>
+            <div class="pnode-role">Trend Finder</div>
+            <div class="pnode-status idle" id="pstatus-1">Standby</div>
+          </div>
+
+          <div class="pipeline-arrow" aria-hidden="true">→</div>
+
+          <div class="pipeline-node" id="pnode-2" role="listitem">
+            <span class="pnode-avatar" aria-hidden="true">✍️</span>
+            <div class="pnode-name">Sari</div>
+            <div class="pnode-role">Summarizer</div>
+            <div class="pnode-status idle" id="pstatus-2">Standby</div>
+          </div>
+
+          <div class="pipeline-arrow" aria-hidden="true">→</div>
+
+          <div class="pipeline-node" id="pnode-3" role="listitem">
+            <span class="pnode-avatar" aria-hidden="true">💡</span>
+            <div class="pnode-name">Raka</div>
+            <div class="pnode-role">Prompt Maker</div>
+            <div class="pnode-status idle" id="pstatus-3">Standby</div>
+          </div>
+
+          <div class="pipeline-arrow" aria-hidden="true">→</div>
+
+          <div class="pipeline-node" id="pnode-4" role="listitem">
+            <span class="pnode-avatar" aria-hidden="true">🎥</span>
+            <div class="pnode-name">Nisa</div>
+            <div class="pnode-role">Video Creator</div>
+            <div class="pnode-status idle" id="pstatus-4">Standby</div>
+          </div>
+
         </div>
+      </div><!-- /.pipeline-section -->
+
+      <!-- Dashboard bottom: log + manual run -->
+      <div class="dashboard-bottom">
+
+        <div class="activity-log-card">
+          <h2 class="section-title">📋 Log Aktivitas</h2>
+          <div class="activity-log" id="activity-log" role="log" aria-live="polite" aria-label="Log aktivitas sistem">
+            <div class="log-empty">Belum ada aktivitas. Masukkan API Key terlebih dahulu.</div>
+          </div>
+        </div>
+
+        <div class="manual-run-card">
+          <h2 class="section-title">🚀 Jalankan Manual</h2>
+          <p class="manual-run-desc">Jalankan pipeline sekarang tanpa menunggu jadwal.</p>
+          <button class="btn-run" id="btn-manual-run" onclick="manualRun()">
+            ▶ Jalankan Semua Agent
+          </button>
+          <div class="run-progress" id="run-progress" hidden>
+            <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text" id="progress-text">Memulai...</div>
+          </div>
+        </div>
+
+      </div><!-- /.dashboard-bottom -->
+    </section><!-- /#page-dashboard -->
+
+
+    <!-- ─── PAGE: API KEYS ─── -->
+    <section class="page" id="page-keys" aria-label="Halaman API Keys">
+      <div class="page-header">
+        <h1 class="page-h1">🔑 Setup API Keys</h1>
+        <p class="page-sub">Masukkan semua API key sekali. Sistem akan otomatis aktif setelahnya.</p>
       </div>
-      <div class="manual-run-card">
-        <h2 class="section-title">🚀 Jalankan Manual</h2>
-        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem">Jalankan pipeline sekarang tanpa menunggu jadwal.</p>
-        <button class="btn-run" id="btn-manual-run" onclick="manualRun()">
-          <span>▶ Jalankan Semua Agent</span>
+
+      <div class="keys-grid">
+
+        <!-- Groq -->
+        <div class="key-card" id="keycard-groq">
+          <div class="key-card-header">
+            <span class="key-logo groq-logo" aria-hidden="true">G</span>
+            <div>
+              <div class="key-name">Groq API Key</div>
+              <div class="key-desc">Untuk Agent Budi — Trend Finder</div>
+            </div>
+            <span class="key-badge" id="badge-groq" aria-label="Status Groq key">❌</span>
+          </div>
+          <div class="key-input-wrap">
+            <input type="password" class="key-input" id="key-groq"
+              placeholder="gsk_xxxxxxxxxxxxxxxxxxxx"
+              autocomplete="off" aria-label="Groq API Key">
+            <button class="key-toggle" onclick="toggleKeyVis('key-groq')" aria-label="Tampilkan/sembunyikan Groq key">👁</button>
+          </div>
+          <a href="https://console.groq.com" target="_blank" rel="noopener" class="key-link">Dapatkan key gratis →</a>
+        </div>
+
+        <!-- Gemini -->
+        <div class="key-card" id="keycard-gemini">
+          <div class="key-card-header">
+            <span class="key-logo gemini-logo" aria-hidden="true">Ge</span>
+            <div>
+              <div class="key-name">Gemini API Key</div>
+              <div class="key-desc">Untuk Agent Sari — Summarizer</div>
+            </div>
+            <span class="key-badge" id="badge-gemini" aria-label="Status Gemini key">❌</span>
+          </div>
+          <div class="key-input-wrap">
+            <input type="password" class="key-input" id="key-gemini"
+              placeholder="AIzaxxxxxxxxxxxxxxxxxxxxxxxx"
+              autocomplete="off" aria-label="Gemini API Key">
+            <button class="key-toggle" onclick="toggleKeyVis('key-gemini')" aria-label="Tampilkan/sembunyikan Gemini key">👁</button>
+          </div>
+          <a href="https://aistudio.google.com" target="_blank" rel="noopener" class="key-link">Dapatkan key gratis →</a>
+        </div>
+
+        <!-- Mistral -->
+        <div class="key-card" id="keycard-mistral">
+          <div class="key-card-header">
+            <span class="key-logo mistral-logo" aria-hidden="true">M</span>
+            <div>
+              <div class="key-name">Mistral API Key</div>
+              <div class="key-desc">Untuk Agent Raka — Prompt Maker</div>
+            </div>
+            <span class="key-badge" id="badge-mistral" aria-label="Status Mistral key">❌</span>
+          </div>
+          <div class="key-input-wrap">
+            <input type="password" class="key-input" id="key-mistral"
+              placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+              autocomplete="off" aria-label="Mistral API Key">
+            <button class="key-toggle" onclick="toggleKeyVis('key-mistral')" aria-label="Tampilkan/sembunyikan Mistral key">👁</button>
+          </div>
+          <a href="https://console.mistral.ai" target="_blank" rel="noopener" class="key-link">Dapatkan key gratis →</a>
+        </div>
+
+        <!-- ElevenLabs -->
+        <div class="key-card" id="keycard-eleven">
+          <div class="key-card-header">
+            <span class="key-logo eleven-logo" aria-hidden="true">E</span>
+            <div>
+              <div class="key-name">ElevenLabs API Key</div>
+              <div class="key-desc">Untuk suara narasi video</div>
+            </div>
+            <span class="key-badge" id="badge-eleven" aria-label="Status ElevenLabs key">❌</span>
+          </div>
+          <div class="key-input-wrap">
+            <input type="password" class="key-input" id="key-eleven"
+              placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+              autocomplete="off" aria-label="ElevenLabs API Key">
+            <button class="key-toggle" onclick="toggleKeyVis('key-eleven')" aria-label="Tampilkan/sembunyikan ElevenLabs key">👁</button>
+          </div>
+          <a href="https://elevenlabs.io" target="_blank" rel="noopener" class="key-link">Dapatkan key gratis →</a>
+        </div>
+
+        <!-- Pexels -->
+        <div class="key-card" id="keycard-pexels">
+          <div class="key-card-header">
+            <span class="key-logo pexels-logo" aria-hidden="true">Px</span>
+            <div>
+              <div class="key-name">Pexels API Key</div>
+              <div class="key-desc">Untuk stok gambar &amp; video</div>
+            </div>
+            <span class="key-badge" id="badge-pexels" aria-label="Status Pexels key">❌</span>
+          </div>
+          <div class="key-input-wrap">
+            <input type="password" class="key-input" id="key-pexels"
+              placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+              autocomplete="off" aria-label="Pexels API Key">
+            <button class="key-toggle" onclick="toggleKeyVis('key-pexels')" aria-label="Tampilkan/sembunyikan Pexels key">👁</button>
+          </div>
+          <a href="https://www.pexels.com/api" target="_blank" rel="noopener" class="key-link">Dapatkan key gratis →</a>
+        </div>
+
+        <!-- Canva -->
+        <div class="key-card" id="keycard-canva">
+          <div class="key-card-header">
+            <span class="key-logo canva-logo" aria-hidden="true">Ca</span>
+            <div>
+              <div class="key-name">Canva API Key</div>
+              <div class="key-desc">Untuk template video visual</div>
+            </div>
+            <span class="key-badge" id="badge-canva" aria-label="Status Canva key">❌</span>
+          </div>
+          <div class="key-input-wrap">
+            <input type="password" class="key-input" id="key-canva"
+              placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+              autocomplete="off" aria-label="Canva API Key">
+            <button class="key-toggle" onclick="toggleKeyVis('key-canva')" aria-label="Tampilkan/sembunyikan Canva key">👁</button>
+          </div>
+          <a href="https://www.canva.com/developers" target="_blank" rel="noopener" class="key-link">Dapatkan key gratis →</a>
+        </div>
+
+      </div><!-- /.keys-grid -->
+
+      <div class="keys-action">
+        <button class="btn-save-keys" onclick="saveAllKeys()">
+          💾 Simpan Semua Key &amp; Aktifkan System
         </button>
-        <div class="run-progress" id="run-progress" style="display:none">
-          <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-          <div class="progress-text" id="progress-text">Memulai...</div>
-        </div>
       </div>
-    </div>
-  </section>
+      <div class="keys-status" id="keys-status" role="status" aria-live="polite"></div>
+    </section><!-- /#page-keys -->
 
-  <!-- PAGE: API KEYS -->
-  <section class="page" id="page-keys">
-    <div class="page-header">
-      <h1 class="page-h1">🔑 Setup API Keys</h1>
-      <p class="page-sub">Masukkan semua API key sekali. Sistem akan otomatis aktif setelahnya.</p>
-    </div>
-    <div class="keys-grid">
-      <div class="key-card">
-        <div class="key-card-header">
-          <span class="key-logo groq-logo">G</span>
-          <div><div class="key-name">Groq API Key</div><div class="key-desc">Untuk Agent Budi — Trend Finder</div></div>
-          <span class="key-badge" id="badge-groq">❌</span>
-        </div>
-        <div class="key-input-wrap">
-          <input type="password" class="key-input" id="key-groq" placeholder="gsk_xxxxxxxxxxxxxxxxxxxx">
-          <button class="key-toggle" onclick="toggleKeyVis('key-groq')">👁</button>
-        </div>
-        <a href="https://console.groq.com" target="_blank" class="key-link">Dapatkan key gratis →</a>
-      </div>
-      <div class="key-card">
-        <div class="key-card-header">
-          <span class="key-logo gemini-logo">Ge</span>
-          <div><div class="key-name">Gemini API Key</div><div class="key-desc">Untuk Agent Sari — Summarizer</div></div>
-          <span class="key-badge" id="badge-gemini">❌</span>
-        </div>
-        <div class="key-input-wrap">
-          <input type="password" class="key-input" id="key-gemini" placeholder="AIzaxxxxxxxxxxxxxxxxxxxxxxxx">
-          <button class="key-toggle" onclick="toggleKeyVis('key-gemini')">👁</button>
-        </div>
-        <a href="https://aistudio.google.com" target="_blank" class="key-link">Dapatkan key gratis →</a>
-      </div>
-      <div class="key-card">
-        <div class="key-card-header">
-          <span class="key-logo mistral-logo">M</span>
-          <div><div class="key-name">Mistral API Key</div><div class="key-desc">Untuk Agent Raka — Prompt Maker</div></div>
-          <span class="key-badge" id="badge-mistral">❌</span>
-        </div>
-        <div class="key-input-wrap">
-          <input type="password" class="key-input" id="key-mistral" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
-          <button class="key-toggle" onclick="toggleKeyVis('key-mistral')">👁</button>
-        </div>
-        <a href="https://console.mistral.ai" target="_blank" class="key-link">Dapatkan key gratis →</a>
-      </div>
-      <div class="key-card">
-        <div class="key-card-header">
-          <span class="key-logo eleven-logo">E</span>
-          <div><div class="key-name">ElevenLabs API Key</div><div class="key-desc">Untuk suara narasi video</div></div>
-          <span class="key-badge" id="badge-eleven">❌</span>
-        </div>
-        <div class="key-input-wrap">
-          <input type="password" class="key-input" id="key-eleven" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
-          <button class="key-toggle" onclick="toggleKeyVis('key-eleven')">👁</button>
-        </div>
-        <a href="https://elevenlabs.io" target="_blank" class="key-link">Dapatkan key gratis →</a>
-      </div>
-      <div class="key-card">
-        <div class="key-card-header">
-          <span class="key-logo pexels-logo">Px</span>
-          <div><div class="key-name">Pexels API Key</div><div class="key-desc">Untuk stok gambar & video</div></div>
-          <span class="key-badge" id="badge-pexels">❌</span>
-        </div>
-        <div class="key-input-wrap">
-          <input type="password" class="key-input" id="key-pexels" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
-          <button class="key-toggle" onclick="toggleKeyVis('key-pexels')">👁</button>
-        </div>
-        <a href="https://www.pexels.com/api" target="_blank" class="key-link">Dapatkan key gratis →</a>
-      </div>
-      <div class="key-card">
-        <div class="key-card-header">
-          <span class="key-logo canva-logo">Ca</span>
-          <div><div class="key-name">Canva API Key</div><div class="key-desc">Untuk template video visual</div></div>
-          <span class="key-badge" id="badge-canva">❌</span>
-        </div>
-        <div class="key-input-wrap">
-          <input type="password" class="key-input" id="key-canva" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
-          <button class="key-toggle" onclick="toggleKeyVis('key-canva')">👁</button>
-        </div>
-        <a href="https://www.canva.com/developers" target="_blank" class="key-link">Dapatkan key gratis →</a>
-      </div>
-    </div>
-    <div class="keys-action">
-      <button class="btn-save-keys" onclick="saveAllKeys()">💾 Simpan Semua Key & Aktifkan System</button>
-    </div>
-    <div class="keys-status" id="keys-status"></div>
-  </section>
 
-  <!-- PAGE: AGENT 1 -->
-  <section class="page" id="page-agent1">
-    <div class="agent-page-layout">
-      <div class="agent-profile-card" style="--agent-color:#FF6B6B">
-        <div class="agent-avatar-big">🔍</div>
-        <div class="agent-name-big">Budi</div>
-        <div class="agent-title-big">Trend Finder</div>
-        <div class="agent-ai-tag">Powered by Groq LLaMA3</div>
-        <div class="agent-stat-mini">
-          <div><span id="a1-runs">0</span><br><small>Total Run</small></div>
-          <div><span id="a1-found">0</span><br><small>Trend Ditemukan</small></div>
-        </div>
-        <div class="agent-current-status" id="a1-current-status">⏸ Standby</div>
-      </div>
-      <div class="agent-chat-section">
-        <div class="chat-title">💬 Chat dengan Budi</div>
-        <div class="chat-messages" id="chat-agent1">
-          <div class="chat-msg agent-msg">
-            <div class="chat-bubble">Halo Boss! Saya Budi, siap mencari trend viral untuk konten Facebook kamu. Setiap jam 7 pagi, 12 siang, dan 8 malam saya akan otomatis bekerja! 🔍</div>
+    <!-- ─── PAGE: AGENT 1 — Budi ─── -->
+    <section class="page" id="page-agent1" aria-label="Halaman Agent Budi">
+      <div class="agent-page-layout">
+
+        <aside class="agent-profile-card" style="--agent-color:#FF6B6B">
+          <span class="agent-avatar-big" aria-hidden="true">🔍</span>
+          <div class="agent-name-big">Budi</div>
+          <div class="agent-title-big">Trend Finder</div>
+          <div class="agent-ai-tag">Powered by Groq LLaMA3</div>
+          <div class="agent-stat-mini">
+            <div><span id="a1-runs">0</span><br><small>Total Run</small></div>
+            <div><span id="a1-found">0</span><br><small>Trend Ditemukan</small></div>
+          </div>
+          <div class="agent-current-status" id="a1-current-status" role="status">⏸ Standby</div>
+        </aside>
+
+        <div class="agent-chat-section">
+          <div class="chat-title">💬 Chat dengan Budi</div>
+          <div class="chat-messages" id="chat-agent1" role="log" aria-live="polite" aria-label="Percakapan dengan Budi">
+            <div class="chat-msg agent-msg">
+              <div class="chat-bubble">Halo Boss! Saya Budi, siap mencari trend viral untuk konten Facebook kamu. Setiap jam 7 pagi, 12 siang, dan 8 malam saya akan otomatis bekerja! 🔍</div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <input type="text" class="chat-input" id="input-agent1"
+              placeholder="Tanya Budi..."
+              aria-label="Pesan untuk Budi"
+              onkeydown="if(event.key==='Enter') sendChat('agent1')">
+            <button class="chat-send" onclick="sendChat('agent1')">Kirim ➤</button>
           </div>
         </div>
-        <div class="chat-input-area">
-          <input type="text" class="chat-input" id="input-agent1" placeholder="Tanya Budi..." onkeydown="if(event.key==='Enter') sendChat('agent1')">
-          <button class="chat-send" onclick="sendChat('agent1')">Kirim ➤</button>
-        </div>
-      </div>
-    </div>
-    <div class="agent-results-section">
-      <h3 class="section-title">📊 Hasil Terakhir Budi</h3>
-      <div class="results-empty" id="a1-results">Belum ada hasil. Jalankan pipeline atau tunggu jadwal otomatis.</div>
-    </div>
-  </section>
 
-  <!-- PAGE: AGENT 2 -->
-  <section class="page" id="page-agent2">
-    <div class="agent-page-layout">
-      <div class="agent-profile-card" style="--agent-color:#FFD93D">
-        <div class="agent-avatar-big">✍️</div>
-        <div class="agent-name-big">Sari</div>
-        <div class="agent-title-big">Summarizer</div>
-        <div class="agent-ai-tag">Powered by Gemini Flash</div>
-        <div class="agent-stat-mini">
-          <div><span id="a2-runs">0</span><br><small>Total Run</small></div>
-          <div><span id="a2-summaries">0</span><br><small>Ringkasan Dibuat</small></div>
-        </div>
-        <div class="agent-current-status" id="a2-current-status">⏸ Standby</div>
+      </div><!-- /.agent-page-layout -->
+
+      <div class="agent-results-section">
+        <h3 class="section-title">📊 Hasil Terakhir Budi</h3>
+        <div class="results-empty" id="a1-results">Belum ada hasil. Jalankan pipeline atau tunggu jadwal otomatis.</div>
       </div>
-      <div class="agent-chat-section">
-        <div class="chat-title">💬 Chat dengan Sari</div>
-        <div class="chat-messages" id="chat-agent2">
-          <div class="chat-msg agent-msg">
-            <div class="chat-bubble">Hai Boss! Saya Sari. Tugas saya meringkas semua trend dari Budi menjadi konten yang menarik dan siap dipakai. ✍️</div>
+    </section><!-- /#page-agent1 -->
+
+
+    <!-- ─── PAGE: AGENT 2 — Sari ─── -->
+    <section class="page" id="page-agent2" aria-label="Halaman Agent Sari">
+      <div class="agent-page-layout">
+
+        <aside class="agent-profile-card" style="--agent-color:#FFD93D">
+          <span class="agent-avatar-big" aria-hidden="true">✍️</span>
+          <div class="agent-name-big">Sari</div>
+          <div class="agent-title-big">Summarizer</div>
+          <div class="agent-ai-tag">Powered by Gemini Flash</div>
+          <div class="agent-stat-mini">
+            <div><span id="a2-runs">0</span><br><small>Total Run</small></div>
+            <div><span id="a2-summaries">0</span><br><small>Ringkasan Dibuat</small></div>
+          </div>
+          <div class="agent-current-status" id="a2-current-status" role="status">⏸ Standby</div>
+        </aside>
+
+        <div class="agent-chat-section">
+          <div class="chat-title">💬 Chat dengan Sari</div>
+          <div class="chat-messages" id="chat-agent2" role="log" aria-live="polite" aria-label="Percakapan dengan Sari">
+            <div class="chat-msg agent-msg">
+              <div class="chat-bubble">Hai Boss! Saya Sari. Tugas saya meringkas semua trend dari Budi menjadi konten yang menarik dan siap dipakai. ✍️</div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <input type="text" class="chat-input" id="input-agent2"
+              placeholder="Tanya Sari..."
+              aria-label="Pesan untuk Sari"
+              onkeydown="if(event.key==='Enter') sendChat('agent2')">
+            <button class="chat-send" onclick="sendChat('agent2')">Kirim ➤</button>
           </div>
         </div>
-        <div class="chat-input-area">
-          <input type="text" class="chat-input" id="input-agent2" placeholder="Tanya Sari..." onkeydown="if(event.key==='Enter') sendChat('agent2')">
-          <button class="chat-send" onclick="sendChat('agent2')">Kirim ➤</button>
-        </div>
-      </div>
-    </div>
-    <div class="agent-results-section">
-      <h3 class="section-title">📝 Ringkasan Terakhir Sari</h3>
-      <div class="results-empty" id="a2-results">Belum ada hasil. Menunggu data dari Budi.</div>
-    </div>
-  </section>
 
-  <!-- PAGE: AGENT 3 -->
-  <section class="page" id="page-agent3">
-    <div class="agent-page-layout">
-      <div class="agent-profile-card" style="--agent-color:#6BCB77">
-        <div class="agent-avatar-big">💡</div>
-        <div class="agent-name-big">Raka</div>
-        <div class="agent-title-big">Prompt Maker</div>
-        <div class="agent-ai-tag">Powered by Mistral AI</div>
-        <div class="agent-stat-mini">
-          <div><span id="a3-runs">0</span><br><small>Total Run</small></div>
-          <div><span id="a3-prompts">0</span><br><small>Prompt Dibuat</small></div>
-        </div>
-        <div class="agent-current-status" id="a3-current-status">⏸ Standby</div>
+      </div><!-- /.agent-page-layout -->
+
+      <div class="agent-results-section">
+        <h3 class="section-title">📝 Ringkasan Terakhir Sari</h3>
+        <div class="results-empty" id="a2-results">Belum ada hasil. Menunggu data dari Budi.</div>
       </div>
-      <div class="agent-chat-section">
-        <div class="chat-title">💬 Chat dengan Raka</div>
-        <div class="chat-messages" id="chat-agent3">
-          <div class="chat-msg agent-msg">
-            <div class="chat-bubble">Yo Boss! Saya Raka. Saya yang bikin ide kreatif dan prompt video dari ringkasan Sari, dioptimasi untuk konten Facebook viral! 💡</div>
+    </section><!-- /#page-agent2 -->
+
+
+    <!-- ─── PAGE: AGENT 3 — Raka ─── -->
+    <section class="page" id="page-agent3" aria-label="Halaman Agent Raka">
+      <div class="agent-page-layout">
+
+        <aside class="agent-profile-card" style="--agent-color:#6BCB77">
+          <span class="agent-avatar-big" aria-hidden="true">💡</span>
+          <div class="agent-name-big">Raka</div>
+          <div class="agent-title-big">Prompt Maker</div>
+          <div class="agent-ai-tag">Powered by Mistral AI</div>
+          <div class="agent-stat-mini">
+            <div><span id="a3-runs">0</span><br><small>Total Run</small></div>
+            <div><span id="a3-prompts">0</span><br><small>Prompt Dibuat</small></div>
+          </div>
+          <div class="agent-current-status" id="a3-current-status" role="status">⏸ Standby</div>
+        </aside>
+
+        <div class="agent-chat-section">
+          <div class="chat-title">💬 Chat dengan Raka</div>
+          <div class="chat-messages" id="chat-agent3" role="log" aria-live="polite" aria-label="Percakapan dengan Raka">
+            <div class="chat-msg agent-msg">
+              <div class="chat-bubble">Yo Boss! Saya Raka. Saya yang bikin ide kreatif dan prompt video dari ringkasan Sari, dioptimasi untuk konten Facebook viral! 💡</div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <input type="text" class="chat-input" id="input-agent3"
+              placeholder="Tanya Raka..."
+              aria-label="Pesan untuk Raka"
+              onkeydown="if(event.key==='Enter') sendChat('agent3')">
+            <button class="chat-send" onclick="sendChat('agent3')">Kirim ➤</button>
           </div>
         </div>
-        <div class="chat-input-area">
-          <input type="text" class="chat-input" id="input-agent3" placeholder="Tanya Raka..." onkeydown="if(event.key==='Enter') sendChat('agent3')">
-          <button class="chat-send" onclick="sendChat('agent3')">Kirim ➤</button>
-        </div>
-      </div>
-    </div>
-    <div class="agent-results-section">
-      <h3 class="section-title">💡 Prompt Terakhir dari Raka</h3>
-      <div class="results-empty" id="a3-results">Belum ada hasil. Menunggu ringkasan dari Sari.</div>
-    </div>
-  </section>
 
-  <!-- PAGE: AGENT 4 -->
-  <section class="page" id="page-agent4">
-    <div class="agent-page-layout">
-      <div class="agent-profile-card" style="--agent-color:#4D96FF">
-        <div class="agent-avatar-big">🎥</div>
-        <div class="agent-name-big">Nisa</div>
-        <div class="agent-title-big">Video Creator</div>
-        <div class="agent-ai-tag">Canva + Pexels + ElevenLabs</div>
-        <div class="agent-stat-mini">
-          <div><span id="a4-runs">0</span><br><small>Total Run</small></div>
-          <div><span id="a4-videos">0</span><br><small>Video Dibuat</small></div>
-        </div>
-        <div class="agent-current-status" id="a4-current-status">⏸ Standby</div>
+      </div><!-- /.agent-page-layout -->
+
+      <div class="agent-results-section">
+        <h3 class="section-title">💡 Prompt Terakhir dari Raka</h3>
+        <div class="results-empty" id="a3-results">Belum ada hasil. Menunggu ringkasan dari Sari.</div>
       </div>
-      <div class="agent-chat-section">
-        <div class="chat-title">💬 Chat dengan Nisa</div>
-        <div class="chat-messages" id="chat-agent4">
-          <div class="chat-msg agent-msg">
-            <div class="chat-bubble">Halo Boss! Saya Nisa. Saya yang mengubah prompt dari Raka menjadi video nyata menggunakan Canva, Pexels, dan ElevenLabs. Siap unduh! 🎥</div>
+    </section><!-- /#page-agent3 -->
+
+
+    <!-- ─── PAGE: AGENT 4 — Nisa ─── -->
+    <section class="page" id="page-agent4" aria-label="Halaman Agent Nisa">
+      <div class="agent-page-layout">
+
+        <aside class="agent-profile-card" style="--agent-color:#4D96FF">
+          <span class="agent-avatar-big" aria-hidden="true">🎥</span>
+          <div class="agent-name-big">Nisa</div>
+          <div class="agent-title-big">Video Creator</div>
+          <div class="agent-ai-tag">Canva + Pexels + ElevenLabs</div>
+          <div class="agent-stat-mini">
+            <div><span id="a4-runs">0</span><br><small>Total Run</small></div>
+            <div><span id="a4-videos">0</span><br><small>Video Dibuat</small></div>
+          </div>
+          <div class="agent-current-status" id="a4-current-status" role="status">⏸ Standby</div>
+        </aside>
+
+        <div class="agent-chat-section">
+          <div class="chat-title">💬 Chat dengan Nisa</div>
+          <div class="chat-messages" id="chat-agent4" role="log" aria-live="polite" aria-label="Percakapan dengan Nisa">
+            <div class="chat-msg agent-msg">
+              <div class="chat-bubble">Halo Boss! Saya Nisa. Saya yang mengubah prompt dari Raka menjadi video nyata menggunakan Canva, Pexels, dan ElevenLabs. Siap unduh! 🎥</div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <input type="text" class="chat-input" id="input-agent4"
+              placeholder="Tanya Nisa..."
+              aria-label="Pesan untuk Nisa"
+              onkeydown="if(event.key==='Enter') sendChat('agent4')">
+            <button class="chat-send" onclick="sendChat('agent4')">Kirim ➤</button>
           </div>
         </div>
-        <div class="chat-input-area">
-          <input type="text" class="chat-input" id="input-agent4" placeholder="Tanya Nisa..." onkeydown="if(event.key==='Enter') sendChat('agent4')">
-          <button class="chat-send" onclick="sendChat('agent4')">Kirim ➤</button>
+
+      </div><!-- /.agent-page-layout -->
+
+      <div class="agent-results-section">
+        <h3 class="section-title">🎬 Video Terakhir dari Nisa</h3>
+        <div class="results-empty" id="a4-results">Belum ada video. Menunggu prompt dari Raka.</div>
+      </div>
+    </section><!-- /#page-agent4 -->
+
+
+    <!-- ─── PAGE: VIDEO OUTPUT ─── -->
+    <section class="page" id="page-results" aria-label="Halaman Video Output">
+      <div class="page-header">
+        <h1 class="page-h1">📦 Video Output</h1>
+        <p class="page-sub">Semua video siap diunduh dan diupload ke Facebook.</p>
+      </div>
+
+      <div class="results-toolbar">
+        <span id="results-count" aria-live="polite">0 video tersedia</span>
+        <button class="btn-clear" onclick="clearResults()">🗑 Hapus Semua</button>
+      </div>
+
+      <div class="video-grid" id="video-grid" role="list" aria-label="Daftar video yang dihasilkan">
+        <div class="video-empty">
+          <span aria-hidden="true" style="font-size:3rem">🎬</span>
+          <p>Belum ada video yang dihasilkan.</p>
+          <p>Jalankan pipeline dari halaman Dashboard.</p>
         </div>
       </div>
-    </div>
-    <div class="agent-results-section">
-      <h3 class="section-title">🎬 Video Terakhir dari Nisa</h3>
-      <div class="results-empty" id="a4-results">Belum ada video. Menunggu prompt dari Raka.</div>
-    </div>
-  </section>
+    </section><!-- /#page-results -->
 
-  <!-- PAGE: RESULTS -->
-  <section class="page" id="page-results">
-    <div class="page-header">
-      <h1 class="page-h1">📦 Video Output</h1>
-      <p class="page-sub">Semua video siap diunduh dan diupload ke Facebook.</p>
-    </div>
-    <div class="results-toolbar">
-      <span id="results-count">0 video tersedia</span>
-      <button class="btn-clear" onclick="clearResults()">🗑 Hapus Semua</button>
-    </div>
-    <div class="video-grid" id="video-grid">
-      <div class="video-empty">
-        <div style="font-size:3rem">🎬</div>
-        <div>Belum ada video yang dihasilkan.</div>
-        <div style="font-size:0.8rem;color:var(--text-muted)">Jalankan pipeline dari halaman Dashboard.</div>
-      </div>
-    </div>
-  </section>
 
-</main>
+  </main><!-- /.main-content -->
 
-<!-- TOAST NOTIFICATION -->
-<div class="toast" id="toast"></div>
 
-<script src="app.js"></script>
+  <!-- ═══════════════════════════════════════
+       TOAST NOTIFICATION
+  ════════════════════════════════════════ -->
+  <div class="toast" id="toast" role="alert" aria-live="assertive" aria-atomic="true"></div>
+
+  <script src="app.js"></script>
 </body>
 </html>
