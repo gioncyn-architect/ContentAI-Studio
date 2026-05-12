@@ -4,20 +4,17 @@
    TOKENS
 ══════════════════════════════════════════════ */
 :root {
-  /* Layout heights */
   --topnav-h     : 62px;
   --schedulebar-h: 34px;
   --titlebar-h   : 42px;
   --header-total : calc(var(--topnav-h) + var(--schedulebar-h) + var(--titlebar-h));
 
-  /* Surfaces */
   --bg-body      : #07090f;
   --bg-nav       : rgba(7, 9, 16, 0.96);
   --bg-card      : #0d1020;
   --bg-card-2    : #10142a;
   --bg-input     : rgba(255, 255, 255, 0.04);
 
-  /* Accents */
   --blue         : #5b8def;
   --purple       : #c77dff;
   --teal         : #4ecca3;
@@ -26,27 +23,22 @@
   --orange       : #ff9f43;
   --green        : #6bcb77;
 
-  /* Text */
   --text-hi      : #eef2ff;
   --text-mid     : #8a9bcc;
   --text-lo      : #3e4d72;
 
-  /* Borders */
   --border       : rgba(255, 255, 255, 0.07);
   --border-hi    : rgba(255, 255, 255, 0.13);
 
-  /* Radii */
   --r-xl : 20px;
   --r-lg : 16px;
   --r-md : 12px;
   --r-sm :  8px;
   --r-xs :  6px;
 
-  /* Fonts */
   --font-display : 'Syne', sans-serif;
   --font-body    : 'Plus Jakarta Sans', sans-serif;
 
-  /* Shadows */
   --shadow-card  : 0 4px 24px rgba(0, 0, 0, 0.35);
   --shadow-pop   : 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.04);
   --glow-blue    : 0 0 24px rgba(91, 141, 239, 0.25);
@@ -68,7 +60,6 @@ body {
   line-height  : 1.5;
 }
 
-/* Subtle ambient glow — pointer-events:none so it never blocks clicks */
 body::before {
   content        : '';
   position       : fixed;
@@ -101,7 +92,6 @@ button { cursor: pointer; }
   gap             : 0;
 }
 
-/* Brand */
 .topnav-brand {
   display     : flex;
   align-items : center;
@@ -124,7 +114,6 @@ button { cursor: pointer; }
   background-clip         : text;
 }
 
-/* Nav links — desktop only */
 .topnav-links {
   display     : flex;
   align-items : center;
@@ -164,10 +153,7 @@ button { cursor: pointer; }
 .nav-icon  { font-size: .93rem; flex-shrink: 0; }
 .nav-label { flex: 1; }
 
-/* ── Agents dropdown ── */
-.nav-dropdown-wrap {
-  position: relative;
-}
+.nav-dropdown-wrap { position: relative; }
 
 .dropdown-arrow {
   font-size  : .68rem;
@@ -218,7 +204,6 @@ button { cursor: pointer; }
 .dropdown-item:hover  { background: rgba(91,141,239,.13); color: #fff; }
 .dropdown-item.active { background: rgba(91,141,239,.16); color: #fff; }
 
-/* Agent status dots */
 .agent-status-dot {
   width        : 7px;
   height       : 7px;
@@ -236,7 +221,6 @@ button { cursor: pointer; }
 .agent-status-dot.done  { background: var(--teal); box-shadow: 0 0 5px var(--teal); }
 .agent-status-dot.error { background: var(--red);  box-shadow: 0 0 5px var(--red); }
 
-/* Video-output badge */
 .result-badge {
   background   : linear-gradient(135deg, var(--red), var(--orange));
   color        : #fff;
@@ -248,7 +232,6 @@ button { cursor: pointer; }
   margin-left  : 2px;
 }
 
-/* Right of navbar */
 .topnav-right {
   display     : flex;
   align-items : center;
@@ -293,7 +276,6 @@ button { cursor: pointer; }
 
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.25} }
 
-/* Hamburger — visible only on mobile */
 .hamburger {
   display       : none;
   flex-direction: column;
@@ -319,13 +301,6 @@ button { cursor: pointer; }
 
 /* ══════════════════════════════════════════════
    MOBILE MENU
-   Completely separate from desktop nav.
-   z-index layering:
-     topnav          = 200
-     nav-dropdown    = 210  (inside topnav, desktop only)
-     mobile-menu     = 190  (below topnav, above overlay)
-     mobile-overlay  = 180  (darkens content behind menu)
-     main-content    =   1
 ══════════════════════════════════════════════ */
 .mobile-menu {
   position        : fixed;
@@ -694,6 +669,7 @@ button { cursor: pointer; }
   font-size    : .9rem;
   font-weight  : 700;
   letter-spacing: .3px;
+  white-space  : nowrap;
   transition   : transform .2s, box-shadow .2s, opacity .2s;
   box-shadow   : 0 4px 20px rgba(91,141,239,.3);
   position     : relative;
@@ -1021,6 +997,7 @@ button { cursor: pointer; }
   font-weight  : 700;
   transition   : transform .2s, box-shadow .2s;
   box-shadow   : 0 3px 12px rgba(91,141,239,.28);
+  white-space  : nowrap;
 }
 .chat-send:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(91,141,239,.44); }
 
@@ -1228,13 +1205,12 @@ button { cursor: pointer; }
 }
 
 /* ══════════════════════════════════════════════
-   RESPONSIVE — 900px  (hamburger kicks in)
+   RESPONSIVE — 900px
 ══════════════════════════════════════════════ */
 @media (max-width: 900px) {
   .topnav-links { display: none; }
   .hamburger    { display: flex; }
   .status-text  { display: none; }
-  /* Agents dropdown never shows on mobile */
   .nav-dropdown { display: none !important; }
 }
 
@@ -1242,24 +1218,96 @@ button { cursor: pointer; }
    RESPONSIVE — 768px
 ══════════════════════════════════════════════ */
 @media (max-width: 768px) {
+  .page          { padding: 18px 14px 50px; }
+  .topnav        { padding: 0 14px; }
+  .schedule-bar  { padding: 0 14px; gap: 10px; }
+  .page-titlebar { padding: 0 14px; }
+  .page-h1       { font-size: 1.4rem; }
+  .page-sub      { font-size: .8rem; }
+
+  /* Stats */
+  .stats-row  { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-card  { padding: 15px 13px 13px; }
+  .stat-val   { font-size: 1.65rem; }
+  .stat-label { font-size: .68rem; white-space: normal; word-break: break-word; }
+
+  /* Pipeline — 2x2 grid, tanpa panah */
   .pipeline {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    overflow-x: unset;
+    display               : grid;
+    grid-template-columns : 1fr 1fr;
+    gap                   : 10px;
+    overflow-x            : unset;
+    padding-bottom        : 0;
   }
   .pipeline-arrow { display: none; }
-  .pipeline-node  { min-width: unset; width: 100%; }
-  .stat-val       { font-size: 1.6rem; }
-  .stat-label     { font-size: .68rem; white-space: normal; }
-  .page-h1        { font-size: 1.4rem; }
+  .pipeline-node  { min-width: unset; width: 100%; padding: 14px 10px; }
+
+  /* Dashboard bottom — 1 kolom penuh */
+  .dashboard-bottom { grid-template-columns: 1fr; }
+
+  /* Tombol run — jangan wrap */
+  .btn-run {
+    font-size  : .82rem;
+    padding    : 12px;
+    white-space: nowrap;
+  }
+
+  /* Agent layout — 1 kolom */
+  .agent-page-layout { grid-template-columns: 1fr; }
+
+  /* Agent profile — horizontal strip */
+  .agent-profile-card {
+    display               : grid;
+    grid-template-columns : auto 1fr;
+    gap                   : 0 14px;
+    text-align            : left;
+    padding               : 16px;
+  }
+  .agent-avatar-big {
+    font-size    : 2.2rem;
+    margin-bottom: 0;
+    grid-row     : 1 / 4;
+    align-self   : center;
+  }
+  .agent-stat-mini      { grid-column: 1 / -1; margin-top: 10px; }
+  .agent-current-status { grid-column: 1 / -1; text-align: center; }
+
+  /* Chat */
+  .chat-messages { min-height: 170px; max-height: 230px; }
+
+  /* Keys — 1 kolom */
+  .keys-grid  { grid-template-columns: 1fr; }
+
+  /* Video — 1 kolom */
+  .video-grid { grid-template-columns: 1fr; }
 }
+
 /* ══════════════════════════════════════════════
    RESPONSIVE — 480px
 ══════════════════════════════════════════════ */
 @media (max-width: 480px) {
-  .page-h1       { font-size: 1.42rem; }
+  .page-h1       { font-size: 1.25rem; }
   .clock-display { display: none; }
-  .stats-row     { gap: 9px; }
-  .stat-val      { font-size: 1.7rem; }
+
+  .stats-row  { gap: 8px; }
+  .stat-val   { font-size: 1.45rem; }
+  .stat-icon  { font-size: 1.1rem; margin-bottom: 6px; }
+
+  .pipeline   { gap: 8px; }
+  .pnode-avatar { font-size: 1.4rem; }
+  .pnode-name   { font-size: .78rem; }
+  .pnode-role   { font-size: .62rem; }
+
+  .btn-run    { font-size: .78rem; }
+
+  .chat-send  { padding: 8px 11px; font-size: .73rem; }
+  .chat-input { font-size: .75rem; }
+
+  .video-actions  { flex-direction: column; }
+  .btn-download,
+  .btn-preview    { width: 100%; text-align: center; }
+
+  .key-logo   { width: 30px; height: 30px; font-size: .7rem; }
+  .key-name   { font-size: .82rem; }
+  .key-desc   { font-size: .67rem; }
 }
