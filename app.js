@@ -35,7 +35,8 @@ const AGENTS = {
   },
   agent4: {
     name: 'Nisa', role: 'Video Creator', ai: 'Shotstack+Pexels', color: '#4D96FF',
-    system: `Kamu adalah Nisa, agen AI yang bertugas membuat video dari prompt yang diberikan Raka. Karaktermu perfeksionis...
+    system: `Kamu adalah Nisa, agen AI yang bertugas membuat video dari prompt yang diberikan Raka. Karaktermu perfeksionis, detail-oriented, dan hasil-focused. Selalu balas dalam Bahasa Indonesia. Jika ada video yang sudah dibuat, ceritakan prosesnya dengan bangga.`
+  }
 };
 
 // ── INIT ────────────────────────────────────────
@@ -45,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
   startScheduler();
   updateAllUI();
 
-  // Close agents dropdown when clicking anywhere outside it
   document.addEventListener('click', (e) => {
     const wrap    = document.getElementById('agents-wrap');
     const trigger = document.getElementById('agents-trigger');
@@ -54,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Close agents dropdown on Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeAgentsDropdown();
@@ -78,7 +77,6 @@ function loadFromStorage() {
     console.warn('ContentAI: failed to load state from storage.', err);
   }
 
-  // Restore key inputs + badges
   Object.entries(STATE.keys).forEach(([k, v]) => {
     const el = document.getElementById(`key-${k}`);
     if (el && v) { el.value = v; updateKeyBadge(k, true); }
@@ -134,7 +132,6 @@ function startScheduler() {
       }
     }
 
-    // Reset schedule flags at midnight
     if (h === 0 && m === 0 && s === 5) {
       STATE.scheduleStatus = { '07': 'pending', '12': 'pending', '20': 'pending' };
     }
@@ -162,9 +159,9 @@ function updateScheduleUI() {
   Object.entries(slots).forEach(([key, hour]) => {
     const el = document.getElementById(`ss-${key}`);
     if (!el) return;
-    if (h > hour)      { el.textContent = '✅'; el.style.color = '#6BCB77'; }
-    else if (h === hour){ el.textContent = '🔄'; el.style.color = '#4D96FF'; }
-    else               { el.textContent = '⏳'; el.style.color = '#7B8DB0'; }
+    if (h > hour)       { el.textContent = '✅'; el.style.color = '#6BCB77'; }
+    else if (h === hour) { el.textContent = '🔄'; el.style.color = '#4D96FF'; }
+    else                { el.textContent = '⏳'; el.style.color = '#7B8DB0'; }
   });
 }
 
@@ -182,7 +179,6 @@ const PAGE_TITLES = {
 const AGENT_PAGES = new Set(['agent1', 'agent2', 'agent3', 'agent4']);
 
 function navigateTo(page) {
-  // Hide all pages & clear active states
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => {
     b.classList.remove('active');
@@ -190,18 +186,15 @@ function navigateTo(page) {
   });
   document.querySelectorAll('.dropdown-item').forEach(b => b.classList.remove('active'));
 
-  // Show target page
   const target = document.getElementById(`page-${page}`);
   if (target) target.classList.add('active');
 
-  // Activate correct top-nav button
   const topBtn = document.querySelector(`.topnav-links [data-page="${page}"]`);
   if (topBtn) {
     topBtn.classList.add('active');
     topBtn.setAttribute('aria-current', 'page');
   }
 
-  // If an agent page, also highlight the Agents trigger button
   if (AGENT_PAGES.has(page)) {
     const trigger = document.getElementById('agents-trigger');
     if (trigger) {
@@ -210,18 +203,14 @@ function navigateTo(page) {
     }
   }
 
-  // Highlight the dropdown item
   const dropItem = document.querySelector(`.dropdown-item[data-page="${page}"]`);
   if (dropItem) dropItem.classList.add('active');
 
-  // Update title bar
   const titleEl = document.getElementById('page-title');
   if (titleEl) titleEl.textContent = PAGE_TITLES[page] || page;
 
-  // Always close dropdown after navigation
   closeAgentsDropdown();
 
-  // Refresh results page if needed
   if (page === 'results') updateResultsPage();
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -260,11 +249,9 @@ function toggleMobileMenu() {
   overlay?.classList.toggle('open', willOpen);
   hamburger?.classList.toggle('open', willOpen);
 
-  // Sync ARIA
   menu.setAttribute('aria-hidden', String(!willOpen));
   hamburger?.setAttribute('aria-expanded', String(willOpen));
 
-  // Close agents dropdown whenever mobile menu toggles
   closeAgentsDropdown();
 }
 
@@ -337,7 +324,6 @@ async function runFullPipeline(source = 'Manual') {
   STATE.stats.runs++;
   setEl('stat-runs', STATE.stats.runs);
 
-  // Show progress bar (uses HTML `hidden` attribute now)
   const progressEl = document.getElementById('run-progress');
   const fillEl     = document.getElementById('progress-fill');
   const textEl     = document.getElementById('progress-text');
@@ -459,7 +445,6 @@ async function runFullPipeline(source = 'Manual') {
   updateResultsPage();
   saveToStorage();
 
-  // Reset pipeline nodes after 10 seconds
   setTimeout(() => {
     [1, 2, 3, 4].forEach(n => setNodeStatus(n, 'idle'));
     ['a1', 'a2', 'a3', 'a4'].forEach(a => setAgentStatus(a, '⏸ Standby'));
@@ -540,7 +525,7 @@ async function sendChat(agentId) {
 
   let reply = '';
   try {
-    if      (agentId === 'agent1' && STATE.keys.groq)   reply = await callGroqChat(STATE.keys.groq,    agent.system, contextPrompt);
+    if      (agentId === 'agent1' && STATE.keys.groq)   reply = await callGroqChat(STATE.keys.groq, agent.system, contextPrompt);
     else if (agentId === 'agent2' && STATE.keys.gemini)  reply = await callGeminiChat(STATE.keys.gemini, agent.system, contextPrompt);
     else if (agentId === 'agent3' && STATE.keys.mistral) reply = await callMistralChat(STATE.keys.mistral, agent.system, contextPrompt);
     else if (agentId === 'agent4' && STATE.keys.gemini)  reply = await callGeminiChat(STATE.keys.gemini, agent.system, contextPrompt);
@@ -667,6 +652,7 @@ async function createVideoData(promptText, source) {
     const title = titles[i];
     const query = getPexelsQuery(promptText, i);
 
+    // Ambil video dari Pexels
     let pexelsVideoUrl = null;
     if (STATE.keys.pexels) {
       try {
@@ -682,7 +668,9 @@ async function createVideoData(promptText, source) {
       } catch(e) { console.warn('Pexels error', e); }
     }
 
-    let renderId = null;
+    // Render video via Shotstack
+    let renderId  = null;
+    let renderUrl = null;
     if (STATE.keys.shotstack && pexelsVideoUrl) {
       try {
         const sRes = await fetch('https://api.shotstack.io/stage/render', {
@@ -703,6 +691,45 @@ async function createVideoData(promptText, source) {
                 {
                   clips: [{
                     asset: {
+                      type: 'title',
+                      text: title,
+                      style: 'future',
+                      color: '#ffffff',
+                      size: 'medium',
+                      background: '#00000080',
+                      position: 'center'
+                    },
+                    start: 0, length: 10
+                  }]
+                }
+              ]
+            },
+            output: { format: 'mp4', resolution: 'sd' }
+          })
+        });
+        const sData = await sRes.json();
+        renderId = sData.response?.id || null;
+        addLog('info', '🎬', `Shotstack render dimulai: ${title}`);
+      } catch(e) { console.warn('Shotstack error', e); }
+    }
+
+    results.push({
+      id          : `vid_${Date.now()}_${i}`,
+      title       : title || `${emojis[i % 5]} Video #${i + 1}`,
+      source, dateLabel, timeLabel,
+      emoji       : emojis[i % 5],
+      prompt      : promptText.slice(0, 200) + '…',
+      pexelsQuery : query,
+      pexelsVideoUrl,
+      renderId,
+      renderUrl,
+      duration    : `${60 + i * 10} detik`,
+      status      : renderId ? 'rendering' : 'brief'
+    });
+  }
+
+  return results;
+}
 
 function extractVideoTitles(text) {
   const titles = [];
@@ -734,17 +761,17 @@ function getPexelsQuery(text, idx) {
 function displayVideoResults(videoData) {
   const container = document.getElementById('a4-results');
   if (!container) return;
-  container.innerHTML = `<div style="color:var(--accent-3);font-weight:600;margin-bottom:12px">✅ ${videoData.length} video berhasil dibuat dan siap diunduh!</div>`;
+  container.innerHTML = `<div style="color:var(--teal);font-weight:600;margin-bottom:12px">✅ ${videoData.length} video berhasil dibuat dan siap diunduh!</div>`;
   videoData.forEach(v => {
     const div = document.createElement('div');
     div.className = 'result-item';
     div.innerHTML = `
       <div class="result-item-header">
-        <span class="result-item-tag">Video Siap</span>
+        <span class="result-item-tag">Video ${v.status === 'rendering' ? '⏳ Rendering' : 'Siap'}</span>
         <span class="result-item-time">${v.timeLabel}</span>
       </div>
       <strong>${v.emoji} ${escHtml(v.title)}</strong><br>
-      <span style="font-size:.75rem;color:var(--text-muted)">Durasi: ${v.duration} | Tanggal: ${v.dateLabel}</span>`;
+      <span style="font-size:.75rem;color:var(--text-mid)">Durasi: ${v.duration} | Tanggal: ${v.dateLabel}</span>`;
     container.appendChild(div);
   });
 }
@@ -826,6 +853,7 @@ async function downloadVideo(id) {
     return;
   }
 
+  // Fallback: download brief teks
   const content = [
     'FACEBOOK CONTENT VIDEO BRIEF',
     '='.repeat(40),
@@ -891,7 +919,6 @@ function updateAgentDot(agentId, status) {
 function setProgress(fillEl, textEl, pct, text) {
   if (fillEl) {
     fillEl.style.width = `${pct}%`;
-    // Sync progressbar ARIA
     fillEl.closest('[role="progressbar"]')?.setAttribute('aria-valuenow', pct);
   }
   if (textEl) textEl.textContent = text;
@@ -912,7 +939,6 @@ function addLog(type, icon, text) {
   log.appendChild(entry);
   log.scrollTop = log.scrollHeight;
 
-  // Keep log lean — max 50 entries
   while (log.children.length > 50) log.removeChild(log.firstChild);
 }
 
@@ -934,10 +960,10 @@ function generateFallbackPrompt() {
 
 function getFallbackReply(agentId, _msg) {
   const replies = {
-    agent1: 'Halo Boss! Saya Budi, sedang standby. Untuk mengaktifkan saya secara penuh, masukkan Groq API key di halaman API Keys. Data demo sudah saya siapkan! 🔍',
-    agent2: 'Hai Boss! Sari di sini. Untuk respons real-time, masukkan Gemini API key ya! Data demo sudah tersedia. ✍️',
+    agent1: 'Halo Boss! Saya Budi, sedang standby. Untuk mengaktifkan saya secara penuh, masukkan Groq API key di halaman API Keys. 🔍',
+    agent2: 'Hai Boss! Sari di sini. Untuk respons real-time, masukkan Gemini API key ya! ✍️',
     agent3: 'Yo Boss! Raka siap! Untuk fitur penuh, masukkan Mistral API key! 💡',
-    agent4: 'Halo Boss! Nisa di sini. Video brief sudah siap dan bisa diunduh dari halaman Video Output! 🎥'
+    agent4: 'Halo Boss! Nisa di sini. Video siap diunduh dari halaman Video Output! 🎥'
   };
   return replies[agentId] || 'Maaf, saya tidak bisa menjawab saat ini. Coba lagi!';
 }
