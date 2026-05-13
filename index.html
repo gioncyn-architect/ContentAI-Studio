@@ -117,8 +117,6 @@
 
   <!-- ═══════════════════════════════════════
        MOBILE MENU (slide-down panel)
-       Completely separate from desktop nav.
-       The agents dropdown DOES NOT appear here.
   ════════════════════════════════════════ -->
   <nav
     class="mobile-menu"
@@ -135,7 +133,6 @@
       <span aria-hidden="true">🔑</span> API Keys
     </button>
 
-    <!-- Section label, not a button -->
     <div class="mob-section" role="separator" aria-hidden="true">🤖 Agent Karyawan</div>
 
     <button class="mob-btn" data-page="agent1"
@@ -160,7 +157,6 @@
     </button>
   </nav>
 
-  <!-- Dark overlay behind mobile menu -->
   <div
     class="mobile-overlay"
     id="mobile-overlay"
@@ -212,7 +208,6 @@
         <p class="page-sub">Semua agent bekerja otomatis. Monitor progres mereka di sini.</p>
       </div>
 
-      <!-- Stats row -->
       <div class="stats-row" role="list" aria-label="Statistik sistem">
         <div class="stat-card" style="--c:#FF6B6B" role="listitem">
           <span class="stat-icon" aria-hidden="true">🎬</span>
@@ -236,7 +231,6 @@
         </div>
       </div>
 
-      <!-- Pipeline section -->
       <div class="pipeline-section">
         <h2 class="section-title">🔄 Pipeline Agent (Real-time)</h2>
         <div class="pipeline" role="list" aria-label="Status pipeline agent">
@@ -278,7 +272,6 @@
         </div>
       </div><!-- /.pipeline-section -->
 
-      <!-- Dashboard bottom: log + manual run -->
       <div class="dashboard-bottom">
 
         <div class="activity-log-card">
@@ -410,24 +403,35 @@
           <a href="https://www.pexels.com/api" target="_blank" rel="noopener" class="key-link">Dapatkan key gratis →</a>
         </div>
 
-<!-- Shotstack -->
-<div class="key-card" id="keycard-shotstack">
-  <div class="key-card-header">
-    <span class="key-logo" style="background:linear-gradient(135deg,#00c2a8,#0072f5)" aria-hidden="true">Sh</span>
-    <div>
-      <div class="key-name">Shotstack API Key</div>
-      <div class="key-desc">Untuk render video otomatis</div>
-    </div>
-    <span class="key-badge" id="badge-shotstack" aria-label="Status Shotstack key">❌</span>
-  </div>
-  <div class="key-input-wrap">
-    <input type="password" class="key-input" id="key-shotstack"
-      placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-      autocomplete="off" aria-label="Shotstack API Key">
-    <button class="key-toggle" onclick="toggleKeyVis('key-shotstack')" aria-label="Tampilkan/sembunyikan Shotstack key">👁</button>
-  </div>
-  <a href="https://shotstack.io" target="_blank" rel="noopener" class="key-link">Dapatkan key gratis →</a>
-</div>
+        <!-- Shotstack -->
+        <div class="key-card" id="keycard-shotstack">
+          <div class="key-card-header">
+            <span class="key-logo" style="background:linear-gradient(135deg,#00c2a8,#0072f5)" aria-hidden="true">Sh</span>
+            <div>
+              <div class="key-name">Shotstack API Key</div>
+              <div class="key-desc">Untuk render video otomatis</div>
+            </div>
+            <span class="key-badge" id="badge-shotstack" aria-label="Status Shotstack key">❌</span>
+          </div>
+          <div class="key-input-wrap">
+            <input type="password" class="key-input" id="key-shotstack"
+              placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+              autocomplete="off" aria-label="Shotstack API Key">
+            <button class="key-toggle" onclick="toggleKeyVis('key-shotstack')" aria-label="Tampilkan/sembunyikan Shotstack key">👁</button>
+          </div>
+          <a href="https://shotstack.io" target="_blank" rel="noopener" class="key-link">Dapatkan key gratis →</a>
+        </div>
+
+      </div><!-- /.keys-grid -->
+
+      <!-- ✅ BUG FIX: Tombol simpan yang hilang -->
+      <div class="keys-save-wrap">
+        <button class="btn-save-keys" onclick="saveAllKeys()">
+          💾 Simpan Semua API Key
+        </button>
+      </div>
+
+    </section><!-- /#page-keys -->
 
 
     <!-- ─── PAGE: AGENT 1 — Budi ─── -->
