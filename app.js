@@ -296,7 +296,7 @@ function updateKeyBadge(key, active) {
 }
 
 function saveAllKeys() {
-  const keyMap = ['groq', 'gemini', 'mistral', 'eleven', 'pexels', 'canva'];
+  const keyMap = ['groq', 'gemini', 'mistral', 'eleven', 'pexels', 'shotstack'];
   let saved = 0;
 
   keyMap.forEach(k => {
