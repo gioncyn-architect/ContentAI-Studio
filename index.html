@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#07090f">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="ContentAI">
+  <meta name="theme-color" content="#07090f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="ContentAI">
   <title>ContentAI Studio — Facebook Agent</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -19,13 +19,11 @@
   ════════════════════════════════════════ -->
   <header class="topnav" id="topnav" role="banner">
 
-    <!-- Brand -->
     <div class="topnav-brand">
       <span class="brand-icon" aria-hidden="true">🎬</span>
       <span class="brand-name">ContentAI</span>
     </div>
 
-    <!-- Desktop nav links — hidden on mobile via CSS -->
     <nav class="topnav-links" aria-label="Navigasi utama">
 
       <button class="nav-btn active" data-page="dashboard" onclick="navigateTo('dashboard')" aria-current="page">
@@ -38,7 +36,6 @@
         <span class="nav-label">API Keys</span>
       </button>
 
-      <!-- Agents dropdown wrapper — stays inside nav, never overlaps mobile menu -->
       <div class="nav-dropdown-wrap" id="agents-wrap">
         <button
           class="nav-btn nav-dropdown-trigger"
@@ -53,12 +50,7 @@
           <span class="dropdown-arrow" id="dropdown-arrow" aria-hidden="true">▾</span>
         </button>
 
-        <div
-          class="nav-dropdown"
-          id="agents-dropdown"
-          role="menu"
-          aria-labelledby="agents-trigger"
-        >
+        <div class="nav-dropdown" id="agents-dropdown" role="menu" aria-labelledby="agents-trigger">
           <button class="dropdown-item" data-page="agent1" role="menuitem" onclick="navigateTo('agent1')">
             <span aria-hidden="true">🔍</span>
             Budi — Trend Finder
@@ -90,14 +82,12 @@
 
     </nav><!-- /.topnav-links -->
 
-    <!-- Right section: clock, status, hamburger -->
     <div class="topnav-right">
       <div class="clock-display" id="clock-display" aria-live="polite" aria-label="Jam saat ini">--:--:--</div>
       <div class="system-status" role="status">
         <span class="pulse-dot" aria-hidden="true"></span>
         <span class="status-text">Aktif</span>
       </div>
-      <!-- Hamburger — visible only on mobile -->
       <button
         class="hamburger"
         id="hamburger"
@@ -116,53 +106,34 @@
 
 
   <!-- ═══════════════════════════════════════
-       MOBILE MENU (slide-down panel)
+       MOBILE MENU
   ════════════════════════════════════════ -->
-  <nav
-    class="mobile-menu"
-    id="mobile-menu"
-    aria-label="Menu mobile"
-    aria-hidden="true"
-  >
-    <button class="mob-btn" data-page="dashboard"
-      onclick="navigateTo('dashboard'); toggleMobileMenu()">
+  <nav class="mobile-menu" id="mobile-menu" aria-label="Menu mobile" aria-hidden="true">
+    <button class="mob-btn" data-page="dashboard" onclick="navigateTo('dashboard'); toggleMobileMenu()">
       <span aria-hidden="true">⚡</span> Dashboard
     </button>
-    <button class="mob-btn" data-page="keys"
-      onclick="navigateTo('keys'); toggleMobileMenu()">
+    <button class="mob-btn" data-page="keys" onclick="navigateTo('keys'); toggleMobileMenu()">
       <span aria-hidden="true">🔑</span> API Keys
     </button>
-
     <div class="mob-section" role="separator" aria-hidden="true">🤖 Agent Karyawan</div>
-
-    <button class="mob-btn" data-page="agent1"
-      onclick="navigateTo('agent1'); toggleMobileMenu()">
+    <button class="mob-btn" data-page="agent1" onclick="navigateTo('agent1'); toggleMobileMenu()">
       <span aria-hidden="true">🔍</span> Budi — Trend Finder
     </button>
-    <button class="mob-btn" data-page="agent2"
-      onclick="navigateTo('agent2'); toggleMobileMenu()">
+    <button class="mob-btn" data-page="agent2" onclick="navigateTo('agent2'); toggleMobileMenu()">
       <span aria-hidden="true">✍️</span> Sari — Summarizer
     </button>
-    <button class="mob-btn" data-page="agent3"
-      onclick="navigateTo('agent3'); toggleMobileMenu()">
+    <button class="mob-btn" data-page="agent3" onclick="navigateTo('agent3'); toggleMobileMenu()">
       <span aria-hidden="true">💡</span> Raka — Prompt Maker
     </button>
-    <button class="mob-btn" data-page="agent4"
-      onclick="navigateTo('agent4'); toggleMobileMenu()">
+    <button class="mob-btn" data-page="agent4" onclick="navigateTo('agent4'); toggleMobileMenu()">
       <span aria-hidden="true">🎥</span> Nisa — Video Creator
     </button>
-    <button class="mob-btn" data-page="results"
-      onclick="navigateTo('results'); toggleMobileMenu()">
+    <button class="mob-btn" data-page="results" onclick="navigateTo('results'); toggleMobileMenu()">
       <span aria-hidden="true">📦</span> Video Output
     </button>
   </nav>
 
-  <div
-    class="mobile-overlay"
-    id="mobile-overlay"
-    onclick="toggleMobileMenu()"
-    aria-hidden="true"
-  ></div>
+  <div class="mobile-overlay" id="mobile-overlay" onclick="toggleMobileMenu()" aria-hidden="true"></div>
 
 
   <!-- ═══════════════════════════════════════
@@ -371,7 +342,7 @@
             <span class="key-logo eleven-logo" aria-hidden="true">E</span>
             <div>
               <div class="key-name">ElevenLabs API Key</div>
-              <div class="key-desc">Untuk suara narasi video</div>
+              <div class="key-desc">Untuk suara narasi video (gratis 10k karakter/bln)</div>
             </div>
             <span class="key-badge" id="badge-eleven" aria-label="Status ElevenLabs key">❌</span>
           </div>
@@ -390,7 +361,7 @@
             <span class="key-logo pexels-logo" aria-hidden="true">Px</span>
             <div>
               <div class="key-name">Pexels API Key</div>
-              <div class="key-desc">Untuk stok gambar &amp; video</div>
+              <div class="key-desc">Untuk stok video background (gratis unlimited)</div>
             </div>
             <span class="key-badge" id="badge-pexels" aria-label="Status Pexels key">❌</span>
           </div>
@@ -409,7 +380,7 @@
             <span class="key-logo" style="background:linear-gradient(135deg,#00c2a8,#0072f5)" aria-hidden="true">Sh</span>
             <div>
               <div class="key-name">Shotstack API Key</div>
-              <div class="key-desc">Untuk render video otomatis</div>
+              <div class="key-desc">Untuk render &amp; rakit video final otomatis</div>
             </div>
             <span class="key-badge" id="badge-shotstack" aria-label="Status Shotstack key">❌</span>
           </div>
@@ -422,9 +393,27 @@
           <a href="https://shotstack.io" target="_blank" rel="noopener" class="key-link">Dapatkan key gratis →</a>
         </div>
 
+        <!-- ✅ BARU: Kling AI -->
+        <div class="key-card" id="keycard-kling">
+          <div class="key-card-header">
+            <span class="key-logo" style="background:linear-gradient(135deg,#ff6b35,#f7c59f)" aria-hidden="true">K</span>
+            <div>
+              <div class="key-name">Kling AI API Key</div>
+              <div class="key-desc">Untuk generate avatar bergerak &amp; video dance (gratis 10 video/hari)</div>
+            </div>
+            <span class="key-badge" id="badge-kling" aria-label="Status Kling key">❌</span>
+          </div>
+          <div class="key-input-wrap">
+            <input type="password" class="key-input" id="key-kling"
+              placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+              autocomplete="off" aria-label="Kling AI API Key">
+            <button class="key-toggle" onclick="toggleKeyVis('key-kling')" aria-label="Tampilkan/sembunyikan Kling key">👁</button>
+          </div>
+          <a href="https://klingai.com" target="_blank" rel="noopener" class="key-link">Dapatkan key gratis →</a>
+        </div>
+
       </div><!-- /.keys-grid -->
 
-      <!-- ✅ BUG FIX: Tombol simpan yang hilang -->
       <div class="keys-save-wrap">
         <button class="btn-save-keys" onclick="saveAllKeys()">
           💾 Simpan Semua API Key
@@ -565,7 +554,8 @@
           <span class="agent-avatar-big" aria-hidden="true">🎥</span>
           <div class="agent-name-big">Nisa</div>
           <div class="agent-title-big">Video Creator</div>
-          <div class="agent-ai-tag">Shotstack + Pexels + ElevenLabs</div>
+          <!-- ✅ UPDATE: pipeline baru Kling + Shotstack + ElevenLabs -->
+          <div class="agent-ai-tag">Kling AI + Shotstack + ElevenLabs</div>
           <div class="agent-stat-mini">
             <div><span id="a4-runs">0</span><br><small>Total Run</small></div>
             <div><span id="a4-videos">0</span><br><small>Video Dibuat</small></div>
@@ -577,7 +567,8 @@
           <div class="chat-title">💬 Chat dengan Nisa</div>
           <div class="chat-messages" id="chat-agent4" role="log" aria-live="polite" aria-label="Percakapan dengan Nisa">
             <div class="chat-msg agent-msg">
-              <div class="chat-bubble">Halo Boss! Saya Nisa. Saya yang mengubah prompt dari Raka menjadi video nyata menggunakan Shotstack, Pexels, dan ElevenLabs. Siap unduh! 🎥</div>
+              <!-- ✅ UPDATE: bubble chat sesuai pipeline baru -->
+              <div class="chat-bubble">Halo Boss! Saya Nisa. Saya yang mengubah prompt dari Raka menjadi video AI avatar bergerak — pakai Kling AI untuk generate karakter casual yang dance dan bergerak ikuti trend, ElevenLabs untuk suara narasi Bahasa Indonesia, lalu Shotstack untuk merakit jadi video final siap upload Facebook! 🎥✨</div>
             </div>
           </div>
           <div class="chat-input-area">
