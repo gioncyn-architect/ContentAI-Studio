@@ -33,9 +33,10 @@ const AGENTS = {
     name: 'Raka', role: 'Prompt Maker', ai: 'Mistral', color: '#6BCB77',
     system: `Kamu adalah Raka, agen AI yang bertugas membuat prompt dan ide kreatif untuk video Facebook. Karaktermu energetik, kreatif, dan inovatif. Selalu balas dalam Bahasa Indonesia dengan antusias. Buat ide yang fresh dan viral-worthy.`
   },
+  // ── DIUPDATE: Nisa kini pakai pipeline Kling AI → ElevenLabs → Shotstack ──
   agent4: {
-    name: 'Nisa', role: 'Video Creator', ai: 'Shotstack+Pexels', color: '#4D96FF',
-    system: `Kamu adalah Nisa, agen AI yang bertugas membuat video dari prompt yang diberikan Raka. Karaktermu perfeksionis, detail-oriented, dan hasil-focused. Selalu balas dalam Bahasa Indonesia. Jika ada video yang sudah dibuat, ceritakan prosesnya dengan bangga.`
+    name: 'Nisa', role: 'Video Creator', ai: 'Kling+ElevenLabs+Shotstack', color: '#4D96FF',
+    system: `Kamu adalah Nisa, agen AI yang bertugas membuat video profesional menggunakan pipeline terbaru: Kling AI untuk generate avatar video, ElevenLabs untuk narasi suara yang natural, dan Shotstack untuk merakit semua elemen menjadi video final yang sempurna. Karaktermu perfeksionis, detail-oriented, dan hasil-focused. Selalu balas dalam Bahasa Indonesia. Jika ada video yang sudah dibuat, ceritakan prosesnya dengan bangga — mulai dari avatar yang di-generate Kling AI, narasi suara dari ElevenLabs, hingga hasil akhir yang dirakit Shotstack.`
   }
 };
 
@@ -159,9 +160,9 @@ function updateScheduleUI() {
   Object.entries(slots).forEach(([key, hour]) => {
     const el = document.getElementById(`ss-${key}`);
     if (!el) return;
-    if (h > hour)       { el.textContent = '✅'; el.style.color = '#6BCB77'; }
+    if (h > hour)        { el.textContent = '✅'; el.style.color = '#6BCB77'; }
     else if (h === hour) { el.textContent = '🔄'; el.style.color = '#4D96FF'; }
-    else                { el.textContent = '⏳'; el.style.color = '#7B8DB0'; }
+    else                 { el.textContent = '⏳'; el.style.color = '#7B8DB0'; }
   });
 }
 
@@ -282,8 +283,9 @@ function updateKeyBadge(key, active) {
   if (card) card.classList.toggle('active', active);
 }
 
+// ── DIUPDATE: tambah 'kling' ke keyMap ──
 function saveAllKeys() {
-  const keyMap = ['groq', 'gemini', 'mistral', 'eleven', 'pexels', 'shotstack'];
+  const keyMap = ['groq', 'gemini', 'mistral', 'eleven', 'pexels', 'shotstack', 'kling'];
   let saved = 0;
 
   keyMap.forEach(k => {
@@ -435,7 +437,7 @@ async function runFullPipeline(source = 'Manual') {
   setEl('a4-videos', STATE.agentStats.a4.videos);
   updateAgentDot('agent4', 'done');
   setEl('result-badge', STATE.videos.length);
-  addAgentChat('agent4', `Boss! Video sudah selesai dibuat! 🎉\n\nSaya berhasil membuat ${videoData.length} video dari prompt Raka. Semua sudah tersedia di halaman Video Output dan siap diunduh!\n\nTinggal download dan upload ke Facebook! 🚀`);
+  addAgentChat('agent4', `Boss! Video sudah selesai dibuat! 🎉\n\nSaya berhasil membuat ${videoData.length} video dari prompt Raka menggunakan pipeline baru: Kling AI generate avatar → ElevenLabs narasi suara → Shotstack rakit video final. Semua sudah tersedia di halaman Video Output dan siap diunduh!\n\nTinggal download dan upload ke Facebook! 🚀`);
   displayVideoResults(videoData);
 
   await delay(1000);
@@ -639,7 +641,8 @@ function displayAgentResult(agentKey, text, tag) {
   container.appendChild(div);
 }
 
-// ── VIDEO CREATION ────────────────────────────────
+// ── VIDEO CREATION (DIUPDATE) ─────────────────────
+// Pipeline baru: Kling AI generate avatar → ElevenLabs narasi → Shotstack rakit final
 async function createVideoData(promptText, source) {
   const now       = new Date();
   const timeLabel = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
@@ -649,86 +652,176 @@ async function createVideoData(promptText, source) {
   const results   = [];
 
   for (let i = 0; i < titles.length; i++) {
-    const title = titles[i];
-    const query = getPexelsQuery(promptText, i);
+    const title  = titles[i];
+    const narasi = extractNarasi(promptText, i);
 
-    // Ambil video dari Pexels
-    let pexelsVideoUrl = null;
-    if (STATE.keys.pexels) {
+    // ── STEP 1: Kling AI — generate avatar video ──
+    let klingVideoUrl = null;
+    let klingTaskId   = null;
+    if (STATE.keys.kling) {
       try {
-        const pRes = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=1`, {
-          headers: { Authorization: STATE.keys.pexels }
+        addLog('info', '🤖', `Kling AI: generate avatar untuk "${title}"...`);
+        const kRes = await fetch('https://api.klingai.com/v1/videos/text2video', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${STATE.keys.kling}`,
+            'Content-Type' : 'application/json'
+          },
+          body: JSON.stringify({
+            model_name      : 'kling-v1',
+            prompt          : `Avatar presenter profesional Indonesia membawakan berita: ${title}. ${narasi}`,
+            negative_prompt : 'blurry, low quality',
+            cfg_scale       : 0.5,
+            mode            : 'std',
+            duration        : '5'
+          })
         });
-        const pData = await pRes.json();
-        const files = pData.videos?.[0]?.video_files;
-        if (files) {
-          const sd = files.find(f => f.quality === 'sd') || files[0];
-          pexelsVideoUrl = sd?.link || null;
-        }
-      } catch(e) { console.warn('Pexels error', e); }
+        const kData   = await kRes.json();
+        klingTaskId   = kData.data?.task_id || null;
+        klingVideoUrl = kData.data?.task_result?.videos?.[0]?.url || null;
+        if (klingTaskId) addLog('success', '🤖', `Kling AI task dimulai: ${klingTaskId}`);
+      } catch(e) { console.warn('Kling AI error', e); }
     }
 
-    // Render video via Shotstack
+    // ── STEP 2: ElevenLabs — generate narasi suara ──
+    let elevenAudioUrl = null;
+    if (STATE.keys.eleven && narasi) {
+      try {
+        addLog('info', '🎙️', `ElevenLabs: generate narasi untuk "${title}"...`);
+        // Voice ID default: Rachel (21m00Tcm4TlvDq8ikWAM) — ganti sesuai kebutuhan
+        const eRes = await fetch('https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM', {
+          method: 'POST',
+          headers: {
+            'xi-api-key'  : STATE.keys.eleven,
+            'Content-Type': 'application/json',
+            'Accept'      : 'audio/mpeg'
+          },
+          body: JSON.stringify({
+            text          : narasi,
+            model_id      : 'eleven_multilingual_v2',
+            voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+          })
+        });
+        if (eRes.ok) {
+          const audioBlob = await eRes.blob();
+          elevenAudioUrl  = URL.createObjectURL(audioBlob);
+          addLog('success', '🎙️', `ElevenLabs: narasi audio siap untuk "${title}"`);
+        } else {
+          addLog('info', '🎙️', `ElevenLabs: skip (response ${eRes.status})`);
+        }
+      } catch(e) { console.warn('ElevenLabs error', e); }
+    }
+
+    // ── STEP 3: Shotstack — rakit video final ──
     let renderId  = null;
     let renderUrl = null;
-    if (STATE.keys.shotstack && pexelsVideoUrl) {
+    if (STATE.keys.shotstack) {
       try {
+        addLog('info', '🎬', `Shotstack: merakit video final "${title}"...`);
+
+        // Track video: avatar dari Kling (jika ada) atau fallback solid color
+        const videoTrackClip = klingVideoUrl
+          ? { asset: { type: 'video', src: klingVideoUrl, trim: 0 }, start: 0, length: 10, fit: 'cover' }
+          : { asset: { type: 'luma', style: 'future' }, start: 0, length: 10 };
+
+        const tracks = [
+          { clips: [videoTrackClip] },
+          {
+            clips: [{
+              asset: {
+                type      : 'title',
+                text      : title,
+                style     : 'future',
+                color     : '#ffffff',
+                size      : 'medium',
+                background: '#00000080',
+                position  : 'center'
+              },
+              start: 0, length: 10
+            }]
+          }
+        ];
+
+        // Tambah audio ElevenLabs jika tersedia
+        if (elevenAudioUrl) {
+          tracks.push({
+            clips: [{
+              asset : { type: 'audio', src: elevenAudioUrl, volume: 1 },
+              start : 0,
+              length: 10
+            }]
+          });
+        }
+
         const sRes = await fetch('https://api.shotstack.io/stage/render', {
           method: 'POST',
           headers: {
-            'x-api-key': STATE.keys.shotstack,
+            'x-api-key'   : STATE.keys.shotstack,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            timeline: {
-              tracks: [
-                {
-                  clips: [{
-                    asset: { type: 'video', src: pexelsVideoUrl, trim: 0 },
-                    start: 0, length: 10, fit: 'cover'
-                  }]
-                },
-                {
-                  clips: [{
-                    asset: {
-                      type: 'title',
-                      text: title,
-                      style: 'future',
-                      color: '#ffffff',
-                      size: 'medium',
-                      background: '#00000080',
-                      position: 'center'
-                    },
-                    start: 0, length: 10
-                  }]
-                }
-              ]
-            },
-            output: { format: 'mp4', resolution: 'sd' }
+            timeline: { tracks },
+            output  : { format: 'mp4', resolution: 'sd' }
           })
         });
         const sData = await sRes.json();
         renderId = sData.response?.id || null;
-        addLog('info', '🎬', `Shotstack render dimulai: ${title}`);
+        if (renderId) addLog('success', '🎬', `Shotstack render dimulai: ${title} (ID: ${renderId})`);
       } catch(e) { console.warn('Shotstack error', e); }
     }
 
     results.push({
-      id          : `vid_${Date.now()}_${i}`,
-      title       : title || `${emojis[i % 5]} Video #${i + 1}`,
+      id            : `vid_${Date.now()}_${i}`,
+      title         : title || `${emojis[i % 5]} Video #${i + 1}`,
       source, dateLabel, timeLabel,
-      emoji       : emojis[i % 5],
-      prompt      : promptText.slice(0, 200) + '…',
-      pexelsQuery : query,
-      pexelsVideoUrl,
+      emoji         : emojis[i % 5],
+      prompt        : promptText.slice(0, 200) + '…',
+      narasi,
+      klingTaskId,
+      klingVideoUrl,
+      elevenAudioUrl,
       renderId,
       renderUrl,
-      duration    : `${60 + i * 10} detik`,
-      status      : renderId ? 'rendering' : 'brief'
+      duration      : `${60 + i * 10} detik`,
+      status        : renderId ? 'rendering' : 'brief',
+      pipeline      : {
+        kling    : !!klingVideoUrl,
+        eleven   : !!elevenAudioUrl,
+        shotstack: !!renderId
+      }
     });
   }
 
   return results;
+}
+
+// Helper: ekstrak narasi dari prompt untuk ElevenLabs
+function extractNarasi(text, idx) {
+  const lines  = text.split('\n');
+  const narasi = [];
+  let found    = false;
+  let count    = 0;
+
+  for (const line of lines) {
+    if (/narasi|narration|hook|pembuka/i.test(line)) {
+      found = true;
+      const m = line.match(/:\s*(.+)/);
+      if (m) narasi.push(m[1].trim());
+      count++;
+    } else if (found && line.trim() && count < 3) {
+      narasi.push(line.trim());
+      count++;
+    }
+    if (count >= 3) break;
+  }
+
+  // Fallback: ambil 2 kalimat pertama dari teks
+  if (!narasi.length) {
+    const sentences = text.replace(/\n/g, ' ').split(/[.!?]/).filter(s => s.trim().length > 10);
+    return sentences.slice(idx * 2, idx * 2 + 2).join('. ').trim() + '.';
+  }
+
+  return narasi.join(' ').trim();
 }
 
 function extractVideoTitles(text) {
@@ -763,6 +856,12 @@ function displayVideoResults(videoData) {
   if (!container) return;
   container.innerHTML = `<div style="color:var(--teal);font-weight:600;margin-bottom:12px">✅ ${videoData.length} video berhasil dibuat dan siap diunduh!</div>`;
   videoData.forEach(v => {
+    const pipelineTag = [
+      v.pipeline?.kling     ? '🤖 Kling'      : '',
+      v.pipeline?.eleven    ? '🎙️ ElevenLabs'  : '',
+      v.pipeline?.shotstack ? '🎬 Shotstack'   : ''
+    ].filter(Boolean).join(' → ') || '📄 Brief';
+
     const div = document.createElement('div');
     div.className = 'result-item';
     div.innerHTML = `
@@ -771,7 +870,8 @@ function displayVideoResults(videoData) {
         <span class="result-item-time">${v.timeLabel}</span>
       </div>
       <strong>${v.emoji} ${escHtml(v.title)}</strong><br>
-      <span style="font-size:.75rem;color:var(--text-mid)">Durasi: ${v.duration} | Tanggal: ${v.dateLabel}</span>`;
+      <span style="font-size:.75rem;color:var(--text-mid)">Durasi: ${v.duration} | Tanggal: ${v.dateLabel}</span><br>
+      <span style="font-size:.7rem;color:#4D96FF;margin-top:4px;display:block">Pipeline: ${pipelineTag}</span>`;
     container.appendChild(div);
   });
 }
@@ -796,6 +896,12 @@ function updateResultsPage() {
   grid.innerHTML = '';
 
   [...STATE.videos].reverse().forEach(v => {
+    const pipelineTag = [
+      v.pipeline?.kling     ? '🤖 Kling'      : '',
+      v.pipeline?.eleven    ? '🎙️ ElevenLabs'  : '',
+      v.pipeline?.shotstack ? '🎬 Shotstack'   : ''
+    ].filter(Boolean).join(' → ') || '📄 Brief';
+
     const card = document.createElement('div');
     card.className = 'video-card';
     card.setAttribute('role', 'listitem');
@@ -806,6 +912,7 @@ function updateResultsPage() {
       <div class="video-info">
         <div class="video-title">${escHtml(v.title)}</div>
         <div class="video-meta">📅 ${v.dateLabel} · ⏱ ${v.duration} · ▶ ${v.source}</div>
+        <div class="video-meta" style="color:#4D96FF;font-size:.7rem">🔧 ${pipelineTag}</div>
         <div class="video-actions">
           <button class="btn-download" onclick="downloadVideo('${v.id}')">⬇ Unduh Video</button>
           <button class="btn-preview"  onclick="previewVideo('${v.id}')">👁 Preview</button>
@@ -854,6 +961,12 @@ async function downloadVideo(id) {
   }
 
   // Fallback: download brief teks
+  const pipelineInfo = [
+    v.pipeline?.kling     ? 'Kling AI (avatar)'      : 'Kling AI: key belum diset',
+    v.pipeline?.eleven    ? 'ElevenLabs (narasi)'     : 'ElevenLabs: key belum diset',
+    v.pipeline?.shotstack ? 'Shotstack (video final)' : 'Shotstack: key belum diset'
+  ].join('\n  - ');
+
   const content = [
     'FACEBOOK CONTENT VIDEO BRIEF',
     '='.repeat(40),
@@ -862,10 +975,14 @@ async function downloadVideo(id) {
     `DURASI  : ${v.duration}`,
     `SUMBER  : ${v.source}`,
     '',
-    'PROMPT:',
-    v.prompt,
+    'PIPELINE:',
+    `  - ${pipelineInfo}`,
     '',
-    `Pexels Query: ${v.pexelsQuery}`
+    'NARASI:',
+    v.narasi || '(tidak tersedia)',
+    '',
+    'PROMPT:',
+    v.prompt
   ].join('\n');
 
   const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
@@ -873,7 +990,7 @@ async function downloadVideo(id) {
   const a    = Object.assign(document.createElement('a'), { href: url, download: `video_brief_${v.id}.txt` });
   a.click();
   URL.revokeObjectURL(url);
-  showToast('📥 Brief diunduh (Shotstack key belum diset)');
+  showToast('📥 Brief diunduh (set Kling + ElevenLabs + Shotstack key untuk video penuh)');
 }
 
 function previewVideo(id) {
@@ -963,7 +1080,7 @@ function getFallbackReply(agentId, _msg) {
     agent1: 'Halo Boss! Saya Budi, sedang standby. Untuk mengaktifkan saya secara penuh, masukkan Groq API key di halaman API Keys. 🔍',
     agent2: 'Hai Boss! Sari di sini. Untuk respons real-time, masukkan Gemini API key ya! ✍️',
     agent3: 'Yo Boss! Raka siap! Untuk fitur penuh, masukkan Mistral API key! 💡',
-    agent4: 'Halo Boss! Nisa di sini. Video siap diunduh dari halaman Video Output! 🎥'
+    agent4: 'Halo Boss! Nisa di sini. Saya pakai pipeline terbaru: Kling AI untuk generate avatar, ElevenLabs untuk narasi suara, dan Shotstack untuk merakit video final. Masukkan ketiga key tersebut di halaman API Keys untuk video berkualitas terbaik! 🎥'
   };
   return replies[agentId] || 'Maaf, saya tidak bisa menjawab saat ini. Coba lagi!';
 }
