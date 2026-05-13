@@ -34,9 +34,8 @@ const AGENTS = {
     system: `Kamu adalah Raka, agen AI yang bertugas membuat prompt dan ide kreatif untuk video Facebook. Karaktermu energetik, kreatif, dan inovatif. Selalu balas dalam Bahasa Indonesia dengan antusias. Buat ide yang fresh dan viral-worthy.`
   },
   agent4: {
-    name: 'Nisa', role: 'Video Creator', ai: 'Canva+Pexels', color: '#4D96FF',
-    system: `Kamu adalah Nisa, agen AI yang bertugas membuat video dari prompt yang diberikan Raka. Karaktermu perfeksionis, detail-oriented, dan hasil-focused. Selalu balas dalam Bahasa Indonesia. Jika ada video yang sudah dibuat, ceritakan prosesnya dengan bangga.`
-  }
+    name: 'Nisa', role: 'Video Creator', ai: 'Shotstack+Pexels', color: '#4D96FF',
+    system: `Kamu adalah Nisa, agen AI yang bertugas membuat video dari prompt yang diberikan Raka. Karaktermu perfeksionis...
 };
 
 // ── INIT ────────────────────────────────────────
@@ -662,19 +661,48 @@ async function createVideoData(promptText, source) {
   const dateLabel = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
   const titles    = extractVideoTitles(promptText);
   const emojis    = ['🔥', '💥', '⚡', '🚀', '🌟'];
-  const topics    = ['Viral Indonesia', 'Trending Hari Ini', 'Konten Populer', 'Info Terkini', 'Fakta Menarik'];
+  const results   = [];
 
-  return titles.map((title, i) => ({
-    id          : `vid_${Date.now()}_${i}`,
-    title       : title || `${emojis[i % 5]} Video ${topics[i % 5]} — ${timeLabel}`,
-    source, dateLabel, timeLabel,
-    emoji       : emojis[i % 5],
-    prompt      : promptText.slice(0, 200) + '…',
-    pexelsQuery : getPexelsQuery(promptText, i),
-    duration    : `${60 + i * 10} detik`,
-    status      : 'ready'
-  }));
-}
+  for (let i = 0; i < titles.length; i++) {
+    const title = titles[i];
+    const query = getPexelsQuery(promptText, i);
+
+    let pexelsVideoUrl = null;
+    if (STATE.keys.pexels) {
+      try {
+        const pRes = await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=1`, {
+          headers: { Authorization: STATE.keys.pexels }
+        });
+        const pData = await pRes.json();
+        const files = pData.videos?.[0]?.video_files;
+        if (files) {
+          const sd = files.find(f => f.quality === 'sd') || files[0];
+          pexelsVideoUrl = sd?.link || null;
+        }
+      } catch(e) { console.warn('Pexels error', e); }
+    }
+
+    let renderId = null;
+    if (STATE.keys.shotstack && pexelsVideoUrl) {
+      try {
+        const sRes = await fetch('https://api.shotstack.io/stage/render', {
+          method: 'POST',
+          headers: {
+            'x-api-key': STATE.keys.shotstack,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            timeline: {
+              tracks: [
+                {
+                  clips: [{
+                    asset: { type: 'video', src: pexelsVideoUrl, trim: 0 },
+                    start: 0, length: 10, fit: 'cover'
+                  }]
+                },
+                {
+                  clips: [{
+                    asset: {
 
 function extractVideoTitles(text) {
   const titles = [];
@@ -760,13 +788,47 @@ function updateResultsPage() {
   });
 }
 
-function downloadVideo(id) {
+async function downloadVideo(id) {
   const v = STATE.videos.find(x => x.id === id);
   if (!v) return;
+
+  if (v.renderUrl) {
+    window.open(v.renderUrl, '_blank');
+    showToast('📥 Membuka video...');
+    return;
+  }
+
+  if (v.renderId && STATE.keys.shotstack) {
+    showToast('⏳ Mengecek status render...');
+    try {
+      const res = await fetch(`https://api.shotstack.io/stage/render/${v.renderId}`, {
+        headers: { 'x-api-key': STATE.keys.shotstack }
+      });
+      const data = await res.json();
+      const status = data.response?.status;
+      const url    = data.response?.url;
+
+      if (status === 'done' && url) {
+        v.renderUrl = url;
+        v.status    = 'ready';
+        saveToStorage();
+        updateResultsPage();
+        window.open(url, '_blank');
+        showToast('✅ Video siap! Membuka...');
+      } else if (status === 'failed') {
+        showToast('❌ Render gagal. Coba jalankan pipeline lagi.');
+      } else {
+        showToast(`⏳ Masih rendering (${status})... Coba lagi dalam 1-2 menit.`);
+      }
+    } catch(e) {
+      showToast('❌ Gagal cek status. Periksa koneksi.');
+    }
+    return;
+  }
+
   const content = [
     'FACEBOOK CONTENT VIDEO BRIEF',
     '='.repeat(40),
-    '',
     `JUDUL   : ${v.title}`,
     `TANGGAL : ${v.dateLabel}`,
     `DURASI  : ${v.duration}`,
@@ -775,7 +837,6 @@ function downloadVideo(id) {
     'PROMPT:',
     v.prompt,
     '',
-    'Catatan: File ini berisi brief video. Upload ke Canva untuk membuat video final.',
     `Pexels Query: ${v.pexelsQuery}`
   ].join('\n');
 
@@ -784,7 +845,7 @@ function downloadVideo(id) {
   const a    = Object.assign(document.createElement('a'), { href: url, download: `video_brief_${v.id}.txt` });
   a.click();
   URL.revokeObjectURL(url);
-  showToast('📥 Video brief berhasil diunduh!');
+  showToast('📥 Brief diunduh (Shotstack key belum diset)');
 }
 
 function previewVideo(id) {
@@ -856,50 +917,19 @@ function addLog(type, icon, text) {
 }
 
 // ── FALLBACK DATA ──────────────────────────────────
-function generateFallbackTrends() {
-  return [
-    'LAPORAN TREND VIRAL HARI INI\n',
-    '1. Kenaikan Harga BBM | Masyarakat ramai membahas dampak kenaikan BBM terhadap harga sembako | Engagement: Tinggi',
-    '2. Viral Warung Makan Gratis | Seorang ibu membuka warung makan gratis setiap hari Jumat | Engagement: Tinggi',
-    '3. Teknologi AI di Indonesia | Semakin banyak startup Indonesia menggunakan AI untuk bisnis | Engagement: Sedang',
-    '4. Fenomena FOMO Gen Z | Generasi Z Indonesia semakin tertekan akibat media sosial | Engagement: Tinggi',
-    '5. Wisata Lokal Trending | Destinasi wisata tersembunyi di Indonesia viral di TikTok dan Instagram | Engagement: Sedang',
-    '\n[Demo Mode — Masukkan Groq API key untuk data real-time]'
-  ].join('\n');
+async function generateFallbackTrends() {
+  const today = new Date().toLocaleDateString('id-ID', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+  return `LAPORAN TREND VIRAL — ${today}\nPastikan Groq API key sudah diisi untuk hasil real-time.`;
 }
 
 function generateFallbackSummary() {
-  return `RINGKASAN KONTEN FACEBOOK\n
-1. JUDUL: Harga BBM Naik, Ini Tips Hemat Belanja!
-HOOK: "Harga naik, tapi kamu tetap bisa hemat!"
-POIN: (1) Belanja di pasar lokal (2) Masak sendiri di rumah (3) Gabung komunitas hemat
-CTA: "Komen strategi hematmu!"
-
-2. JUDUL: Warung Gratis yang Bikin Terharu!
-HOOK: "Ada warung yang tidak minta bayar..."
-POIN: (1) Kisah inspiratif ibu berprestasi (2) Dampak sosial nyata (3) Bagaimana kamu bisa ikut
-CTA: "Share kalau kamu terinspirasi!"
-
-[Demo Mode]`;
+  return `Pastikan Gemini API key sudah diisi untuk ringkasan konten otomatis.`;
 }
 
 function generateFallbackPrompt() {
-  return `PROMPT VIDEO FACEBOOK\n
-1. JUDUL VIDEO: Tips Hemat di Tengah Harga Naik
-DURASI: 75 detik
-NARASI: "Harga naik bukan berarti hidupmu susah! Ini 5 tips yang sudah terbukti..."
-VISUAL: Pasar tradisional, ibu memasak, keluarga bahagia
-MUSIK: Upbeat, semangat
-TEXT OVERLAY: Tips muncul satu per satu
-
-2. JUDUL VIDEO: Warung Ibu Ini Bikin Nangis!
-DURASI: 90 detik
-NARASI: "Ada yang tidak percaya? Di kota ini ada warung yang tidak pernah minta bayar..."
-VISUAL: Suasana warung, orang antri, senyum bahagia
-MUSIK: Emosional, menyentuh
-TEXT OVERLAY: Quotes inspiratif
-
-[Demo Mode]`;
+  return `Pastikan Mistral API key sudah diisi untuk prompt video otomatis.`;
 }
 
 function getFallbackReply(agentId, _msg) {
